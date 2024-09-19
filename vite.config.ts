@@ -4,5 +4,6 @@ import generouted from '@generouted/react-router/plugin'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base:"/CRISP/",
   plugins: [react(), generouted()],
 })
