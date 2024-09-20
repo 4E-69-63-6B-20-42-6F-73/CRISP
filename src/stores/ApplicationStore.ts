@@ -33,5 +33,6 @@ const useApplicationStore = create<ApplicationState>()((set) => ({
 
 
 const useAnalyses = () => useApplicationStore(s => s.analyses)
+const useAddAnalyse = () => useApplicationStore(s => s.addAnalyse)
 
-export { useAnalyses }
+export { useAnalyses, useAddAnalyse }
