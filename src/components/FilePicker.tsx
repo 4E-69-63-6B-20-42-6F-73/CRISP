@@ -1,22 +1,22 @@
 import * as React from "react";
 import { useRef, useState } from "react";
-
 import { TagPicker, TagPickerInput, TagPickerControl, TagPickerGroup, Button } from "@fluentui/react-components";
 import { Tag, Avatar, Field } from "@fluentui/react-components";
 import { AttachFilled } from "@fluentui/react-icons";
 
 interface FilePickerProps {
     required?: boolean;
-    accept?: string; 
-    label?: string; 
+    accept?: string;
+    label?: string;
+    onfilechange?: (newFiles: File[]) => void;
 }
 
 export const FilePicker: React.FC<FilePickerProps> = ({
     required = false,
     accept = "",
     label = "Files",
-}) => {
-    const fileUploader = useRef<HTMLInputElement | null>(null); 
+    onfilechange }) => {
+    const fileUploader = useRef<HTMLInputElement | null>(null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
     const handleAddClick = () => {
@@ -28,14 +28,18 @@ export const FilePicker: React.FC<FilePickerProps> = ({
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Backspace" && e.currentTarget.value === "") {
             if (selectedFiles.length > 0) {
-                setSelectedFiles(selectedFiles.slice(0, -1));
+                const newFiles = selectedFiles.slice(0, -1);
+                setSelectedFiles(newFiles);
+                onfilechange && onfilechange(newFiles); // Call onfilechange when files are updated
             }
         }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            setSelectedFiles([...new Set(selectedFiles.concat(Array.from(e.target.files)))]);
+            const newFiles = [...new Set(selectedFiles.concat(Array.from(e.target.files)))];
+            setSelectedFiles(newFiles);
+            onfilechange && onfilechange(newFiles);
         }
     };
 
@@ -47,7 +51,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                 onChange={handleFileChange}
                 multiple
                 style={{ display: "none" }}
-                accept={accept} // Use the provided accept prop
+                accept={accept}
             />
 
             <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -57,7 +61,12 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                     <TagPickerControl style={{ width: "100%" }}>
                         <TagPickerGroup aria-label="Selected Files">
                             {selectedFiles.map((file) => (
-                                <Tag onClick={() => setSelectedFiles(selectedFiles.filter(x => x !== file))}
+                                <Tag
+                                    onClick={() => {
+                                        const newFiles = selectedFiles.filter(x => x !== file);
+                                        setSelectedFiles(newFiles);
+                                        onfilechange && onfilechange(newFiles); // Call onfilechange when a file is removed
+                                    }}
                                     key={file.name}
                                     shape="rounded"
                                     media={<Avatar aria-hidden name={file.name.split('.').pop()} color="colorful" />}
