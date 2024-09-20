@@ -4,6 +4,7 @@ html, body, #root, #root > div {
 
 body {
     margin:0;
+    min-width: 600px;
 }
 
 #root > div {
