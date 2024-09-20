@@ -4,58 +4,57 @@ import { AddFilled } from "@fluentui/react-icons";
 import { useNavigate } from "../../router";
 
 import { makeStyles } from '@fluentui/react-components';
+import { FilePicker } from "../../components/FilePicker";
 
 const useClasses = makeStyles({
-  divCreateButton: {
-    display: "flex",
-    justifyContent: "end"
-  },
-  divMainContentWrapper: {
-    display: "flex",
-    justifyContent: "center"
-  },
-  divMainContent: {
-    marginTop: "12px",
-    width: "75%",
-    maxWidth:"750px",
-    display:"flex",
-    flexDirection:"column",
-    gap: tokens.spacingVerticalL
-  }
+    divCreateButton: {
+        display: "flex",
+        justifyContent: "end"
+    },
+    divMainContentWrapper: {
+        display: "flex",
+        justifyContent: "center"
+    },
+    divMainContent: {
+        marginTop: "12px",
+        width: "75%",
+        maxWidth: "750px",
+        display: "flex",
+        flexDirection: "column",
+        gap: tokens.spacingVerticalL
+    }
 });
 
 export default function Index() {
-  const navigate = useNavigate()
-  const classes = useClasses()
-  return <>
-    <Breadcrumb>
-      <BreadcrumbItem>
-        <BreadcrumbButton onClick={() => navigate("/")}>My analyses</BreadcrumbButton>
-      </BreadcrumbItem>
-      <BreadcrumbDivider />
-      <BreadcrumbItem>
-        <BreadcrumbButton current> Create new </BreadcrumbButton>
-      </BreadcrumbItem>
-    </Breadcrumb>
+    const navigate = useNavigate()
+    const classes = useClasses()
+    return <>
+        <Breadcrumb>
+            <BreadcrumbItem>
+                <BreadcrumbButton onClick={() => navigate("/")}>My analyses</BreadcrumbButton>
+            </BreadcrumbItem>
+            <BreadcrumbDivider />
+            <BreadcrumbItem>
+                <BreadcrumbButton current> Create new </BreadcrumbButton>
+            </BreadcrumbItem>
+        </Breadcrumb>
 
-    <div className={classes.divMainContentWrapper}>
-      <div className={classes.divMainContent}>
-        <Field label="Name" required>
-          <Input />
-        </Field>
+        <div className={classes.divMainContentWrapper}>
+            <div className={classes.divMainContent}>
+                <Field label="Name" required>
+                    <Input />
+                </Field>
 
-        <Field label="Description">
-          <Textarea />
-        </Field>
+                <Field label="Description">
+                    <Textarea />
+                </Field>
 
-        <Field label="Files" required>
-          <Input />
-        </Field>
+                <FilePicker label="Files" accept=".txt, .csv, .xls, .xlsx, text/plain, text/csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
 
-        <div className={classes.divCreateButton}>
-          <Button appearance="primary" icon={<AddFilled />} >Create</Button>
+                <div className={classes.divCreateButton}>
+                    <Button appearance="primary" icon={<AddFilled />} >Create</Button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </>
+    </>
 }
