@@ -84,11 +84,10 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
           <DataGridRow<Analyse>
             key={rowId}
             onClick={() => handleRowClick(item.id)}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: "pointer" }}
             // selectionCell={{
             //   checkboxIndicator: { "aria-label": "Select row" },
             // }}
-            
           >
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>

@@ -1,16 +1,14 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { routes } from '@generouted/react-router'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { routes } from "@generouted/react-router";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import './main.css'
+import "./main.css";
 
-const router = createBrowserRouter(routes, { basename:"/CRISP/" })
+const router = createBrowserRouter(routes, { basename: "/CRISP/" });
 
-createRoot(document.getElementById('root')!).render(
-
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router}/>
-  </StrictMode>,
-)
-
+    <RouterProvider router={router} />
+  </StrictMode>
+);

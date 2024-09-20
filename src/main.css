@@ -1,12 +1,15 @@
-html, body, #root, #root > div {
-    height: 100%
-  }
+html,
+body,
+#root,
+#root > div {
+  height: 100%;
+}
 
 body {
-    margin:0;
-    min-width: 600px;
+  margin: 0;
+  min-width: 600px;
 }
 
 #root > div {
-    background-color: var(--colorNeutralBackground6);
+  background-color: var(--colorNeutralBackground6);
 }
