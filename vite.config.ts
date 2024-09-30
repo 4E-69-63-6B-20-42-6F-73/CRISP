@@ -6,4 +6,5 @@ import generouted from '@generouted/react-router/plugin'
 export default defineConfig({
   base:"/CRISP/",
   plugins: [react(), generouted()],
+  
 })
