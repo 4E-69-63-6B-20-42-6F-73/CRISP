@@ -45,11 +45,11 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
     }),
     createTableColumn<Analyse>({
       columnId: "files",
-      compare: (a, b) => a.files.length - b.files.length, // Example comparison
+      compare: (a, b) => a.files.length - b.files.length,
       renderHeaderCell: () => "Files",
       renderCell: (item) => (
         <TableCellLayout>
-          { item.files.map(x => x.fileName).concat() }
+          {item.files.map((x) => x.fileName).join(", ")}
         </TableCellLayout>
       ),
     }),
@@ -60,16 +60,12 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
       items={items}
       columns={columns}
       sortable
-      getRowId={(item) => item.name} // Use 'name' or another unique property
+      getRowId={(item) => item.id.toString()} // Use a unique property like 'id'
       focusMode="composite"
       style={{ minWidth: "550px" }}
     >
       <DataGridHeader>
-        <DataGridRow
-        //   selectionCell={{
-        //     checkboxIndicator: { "aria-label": "Select all rows" },
-        //   }}
-        >
+        <DataGridRow>
           {({ renderHeaderCell }) => (
             <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
           )}
@@ -78,12 +74,9 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
       <DataGridBody<Analyse>>
         {({ item, rowId }) => (
           <DataGridRow<Analyse>
-            key={rowId}
+            key={rowId} // Use unique rowId
             onClick={() => handleRowClick(item.id)}
             style={{ cursor: "pointer" }}
-            // selectionCell={{
-            //   checkboxIndicator: { "aria-label": "Select row" },
-            // }}
           >
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>
