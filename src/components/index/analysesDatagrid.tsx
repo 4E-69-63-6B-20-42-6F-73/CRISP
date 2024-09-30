@@ -49,11 +49,7 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
       renderHeaderCell: () => "Files",
       renderCell: (item) => (
         <TableCellLayout>
-          {item.files.map((file) => (
-            <div key={file.name}>
-              <TableCellLayout media={""}>{file.name}</TableCellLayout>
-            </div>
-          ))}
+          { item.files.map(x => x.fileName).concat() }
         </TableCellLayout>
       ),
     }),

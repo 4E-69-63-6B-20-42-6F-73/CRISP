@@ -9,7 +9,8 @@ type Analyse = {
 
 // Since we are working with CSV or XLSX we can have diffrent columns.
 type FileWithContent = {
-  file: File;
+  file: File | undefined; // Note this one is undefined after a while. So we should add a filename.
+  fileName:string;
   content: any[];
 }
 

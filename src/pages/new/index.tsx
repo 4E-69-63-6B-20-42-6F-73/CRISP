@@ -54,6 +54,7 @@ export default function Index() {
       files: await Promise.all(
         files.map(async x => ({
           file: x,
+          fileName: x.name,
           content: await extractContent(x),
         }))
       )
