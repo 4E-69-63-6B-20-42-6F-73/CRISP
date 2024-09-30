@@ -10,11 +10,13 @@ import {
   tokens,
 } from "@fluentui/react-components";
 import { AddFilled } from "@fluentui/react-icons";
-import { useNavigate } from "../../router";
+import { useNavigate } from "@/router";
 import { makeStyles } from "@fluentui/react-components";
-import { FilePicker } from "../../components/FilePicker";
+import { FilePicker } from "@/components/FilePicker";
 import { useState } from "react";
-import { useAddAnalyse } from "../../stores/ApplicationStore";
+import { useAddAnalyse } from "@/stores/ApplicationStore";
+import extractContent from "@/utils/extractContent";
+
 
 const useClasses = makeStyles({
   divCreateButton: {
@@ -44,14 +46,19 @@ export default function Index() {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState<File[]>([]);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     const id = addAnalyse({
       name: name,
       description: description,
-      created: new Date(Date.now()),
-      files: files,
-    });
-
+      created: new Date(),
+      files: await Promise.all(
+        files.map(async x => ({
+          file: x,
+          content: await extractContent(x),
+        }))
+      )
+    }); 
+  
     navigate("/predict/:id", { params: { id: id.toString() } });
   };
 

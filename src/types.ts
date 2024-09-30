@@ -3,9 +3,15 @@ type Analyse = {
   name: string;
   description: string;
   created: Date;
-  files: File[];
+  files: FileWithContent[];
   prediction?: Prediction[];
 };
+
+// Since we are working with CSV or XLSX we can have diffrent columns.
+type FileWithContent = {
+  file: File;
+  content: JSON;
+}
 
 type Prediction = {
   patientId: string;
