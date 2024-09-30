@@ -1,4 +1,5 @@
 import { makeStyles, tokens } from "@fluentui/react-components";
+import { Link } from "@/router";
 
 const useClasses = makeStyles({
   h1: {
@@ -20,7 +21,7 @@ export default function AppBar() {
 
   return (
     <div className={classes.div}>
-      <h1 className={classes.h1}>CRISP</h1>
+     <Link style={{textDecoration:"none"}} to={"/"}> <h1 className={classes.h1}> CRISP </h1> </Link>
     </div>
   );
 }
