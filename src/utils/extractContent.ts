@@ -1,14 +1,14 @@
 import papa from "papaparse"
 import * as XLSX from "xlsx";
 
-export default async function ExtractContent(file: File): Promise<JSON> {
+export default async function ExtractContent(file: File): Promise<any[]> {
 
     switch (file.type) {
         case 'text/csv':
-        case 'application/vnd.ms-excel':  // Common MIME type for CSVs
+        case 'application/vnd.ms-excel':  // MIME type for CSVs
             return ExtractCSV(file);
 
-        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':  // XLSX MIME type
+        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':  // MIME type for XLSX
         case 'application/vnd.ms-excel.sheet.macroEnabled.12':
             return ExtractXLSX(file);
        
@@ -17,14 +17,13 @@ export default async function ExtractContent(file: File): Promise<JSON> {
     }
 }
 
-async function ExtractCSV(file: File): Promise<JSON> {
+async function ExtractCSV(file: File): Promise<any[]> {
     return new Promise((resolve, reject) => {
         papa.parse<JSON>(file, {
           header: true,
           complete: function(results) {
-            resolve(JSON.parse(JSON.stringify(results
-                .data
-            ))); 
+            resolve(results.data 
+            ); 
           },
           error: function(error) {
             reject(error);
@@ -33,26 +32,24 @@ async function ExtractCSV(file: File): Promise<JSON> {
       });
 }
 
-async function ExtractXLSX(file: File): Promise<JSON> {
+async function ExtractXLSX(file: File): Promise<any[]> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
-        // When the file is read, we will use xlsx to parse the data
         reader.onload = (event) => {
             const data = event.target?.result;
 
             try {
                 const workbook = XLSX.read(data, { type: 'binary' });
-                const firstSheetName = workbook.SheetNames[0];  // Get the first worksheet name
+                const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet);  // Convert worksheet to JSON
-                resolve(json as unknown as JSON);
+                const json = XLSX.utils.sheet_to_json(worksheet);
+                resolve(json as any[]);
             } catch (error) {
                 reject(error);
             }
         };
 
-        // Read the file as binary string
         reader.onerror = (error) => reject(error);
         reader.readAsBinaryString(file);
     });

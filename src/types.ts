@@ -10,7 +10,7 @@ type Analyse = {
 // Since we are working with CSV or XLSX we can have diffrent columns.
 type FileWithContent = {
   file: File;
-  content: JSON;
+  content: any[];
 }
 
 type Prediction = {
