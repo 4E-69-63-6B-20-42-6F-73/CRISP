@@ -15,6 +15,7 @@ export default function Details() {
 
   const analyse = useGetAnalysesById(id);
 
+  const details = analyse.prediction?.map( x =>  <p> { x.patientId } { x.prediction } </p>)
   return (
     <>
       <Breadcrumb>
@@ -28,6 +29,8 @@ export default function Details() {
           <BreadcrumbButton current> {analyse.name} </BreadcrumbButton>
         </BreadcrumbItem>
       </Breadcrumb>
+
+      {details}
     </>
   );
 }

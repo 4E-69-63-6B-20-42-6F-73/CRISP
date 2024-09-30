@@ -41,8 +41,6 @@ export function usePredict(): [boolean, (data: any[]) => number] {
                 const json = JSON.parse(data.toString())
                 
                 const prediction = (model.predict([tf.tensor([json["cat"].map((value: string) => parseFloat(value))]), tf.tensor( [json["num"].map((value: string) => parseFloat(value))])]) as tf.Tensor).arraySync()
-
-                console.log("Prediction:", prediction)
                 return JSON.stringify(prediction)
             }
             console.log("Loaded tf model");
@@ -51,8 +49,6 @@ export function usePredict(): [boolean, (data: any[]) => number] {
         const loadPyodideAndPackages = async () => {
             console.log("Loading Pyodide and packages");
             const pyodideInstance = await loadPyodide({ packages: ["xgboost", "scikit-learn", "pandas"] });
-            pyodideInstance.setStdout({batched(s:string) {console.log("batched out:", s)}})
-
             console.log("Loaded Pyodide and packages");
 
             setPyodide(pyodideInstance);
@@ -76,8 +72,9 @@ export function usePredict(): [boolean, (data: any[]) => number] {
 
     const predict = (data: any[]): number => {
         const simple = pyodide.pyimport('simple');
-        console.log("Predict called")
-        return simple.predict(model, data) as number
+        const prediction = simple.predict(model, data).toJs()[0]
+
+        return prediction + 1; // + 1 since in the python code 0 == cluster.1
     }
 
     return [loading, predict];

@@ -1,56 +1,64 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ProgressBar } from "@fluentui/react-components";
 
-// import {
-//   useGetAnalysesById,
-//   useAddPrediction,
-// } from "../../stores/ApplicationStore";
-// import { useNavigate, useParams } from "../../router";
-import { usePredict } from "../../model/usePredict";
+import {
+  useGetAnalysesById,
+  useAddPrediction,
+} from "@/stores/ApplicationStore";
+
+import { useNavigate, useParams } from "@/router";
+import { usePredict } from "@/model/usePredict";
 
 export default function Predict() {
-  // const params = useParams("/predict/:id");
-  // const id = Number(params.id);
+  const params = useParams("/predict/:id");
+  const id = Number(params.id);
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  // const addPrediction = useAddPrediction();
+  const addPrediction = useAddPrediction();
   const [loading, predict] = usePredict()
+  const [isPredicting, setIsPredicting] = useState(false)
 
+  const analyse = useGetAnalysesById(id);
 
-  // const [state, setState] = useState<State>("extracting");
-  // const [predicted] = useState(0);
-  // const text = getText(state, predicted, 200);
-
-  const data = "01001|0.3126284518385913|1.4956309894562494|0.33411334769482753|-0.2849260529871922|0.08027216901345147|-0.03340348055189329|1.0|1.0|0.0|1|0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0|1.0|1.0|0.0|0.0|1.0|1.0|0.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0|1.0|1.0|0.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0|1.0|1.0|0.0|0.0|1.0|1.0|0.0|0.0|1.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0|1.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0|1.0|1.0|0.0|0.0|1.0|1.0|0.0|0.0|1.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0|1.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0|1.0|1.0|0.0|1.0|0.0|1.0|0.0|1.0|0.0|0.0".split("|")
-  useEffect(() => {
-    // const simulatePrediction = async () => {
-    //   for await (const newState of predictor()) {
-    //     setState(newState);
-    //   }
-    // };
-    if (!loading){
-    // simulatePrediction();
-      const prediction = predict(data)
-
-      console.log(prediction.toString())
+  if (analyse.prediction !== undefined){
+    navigate("/detail/:id", { params: { id: id.toString() } });
   }
-  }, [loading]);
 
-  // const analyse = useGetAnalysesById(id);
+  useEffect(() => {
+    if (!loading) {
+      setIsPredicting(true)
 
-  // addPrediction(analyse.id, [{ patientId: "123", prediction: 1 }]);
-
-  // navigate("/detail/:id", { params: { id: id.toString() } });
-
-
-  if (loading) 
-    {
-      return <h1>Loading....</h1>
+      const predictions = analyse.files
+      .flatMap(x => x.content as any[])
+      .map(x => Object.values(x) as any[])
+      .map((data) => {
+          const patientId = data[0];
+          try {
+              const prediction = predict(data);
+              return { patientId, prediction };
+          } catch (error) {
+              console.error(`Error predicting for patient ${patientId}:`, error);
+              return { patientId, prediction: -1 };
+          }
+      });
+  
+      
+        addPrediction(id, predictions)
+        setIsPredicting(false)
     }
+  }, [loading])
 
+
+  if (loading) {
+    return <h1>Loading....</h1>
+  }
+  else if (isPredicting) 
+    {
+      return <h1>Predicting....</h1>
+    }
   else {
-    return <>Done!</>
+    return navigate("/detail/:id", { params: { id: id.toString() } }); // TODO Change...
   }
   return (
     <div

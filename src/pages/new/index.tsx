@@ -57,7 +57,7 @@ export default function Index() {
           content: await extractContent(x),
         }))
       )
-    }); 
+    });
   
     navigate("/predict/:id", { params: { id: id.toString() } });
   };
