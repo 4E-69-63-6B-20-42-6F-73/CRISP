@@ -13,27 +13,46 @@ the python code should be in web_model/python.zip
 
 declare function loadPyodide(options: { packages: string[] }): Promise<any>;
 
-export function usePredict() {
+
+// TODO find beter name to make clear this is a class to be used on the edge between Typescript and Python
+interface ModelShim extends tf.LayersModel {
+    encoder_j: (data: any) => any; 
+
+}
+
+
+export function usePredict(): [boolean, (data: any[]) => number] {
     const [loading, setLoading] = useState(true);
     const [pyodide, setPyodide] = useState<any>(null);
     const [model, setModel] = useState<any>(null);
 
-    // // Load TensorFlow.js model
     useEffect(() => {
         const loadModel = async () => {
-            const model = await tf.loadGraphModel('/CRISP/web_model/replication_mmae/model.json');
+            const model = await tf.loadLayersModel('/CRISP/web_model/encoder_tfjs/model.json') as ModelShim;
             setModel(model);
+
+            console.log(model.inputs)
+            console.log(model.outputs)
+            // console.log(model.modelSignature)
+            
+            model.encoder_j = (data:any):any => {
+                console.log(data.toString())
+
+                const json = JSON.parse(data.toString())
+                
+                const prediction = (model.predict([tf.tensor([json["cat"].map((value: string) => parseFloat(value))]), tf.tensor( [json["num"].map((value: string) => parseFloat(value))])]) as tf.Tensor).arraySync()
+
+                console.log("Prediction:", prediction)
+                return JSON.stringify(prediction)
+            }
             console.log("Loaded tf model");
         };
 
-        loadModel();
-    }, []);
-
-    // Load Pyodide and Python packages
-    useEffect(() => {
         const loadPyodideAndPackages = async () => {
             console.log("Loading Pyodide and packages");
             const pyodideInstance = await loadPyodide({ packages: ["xgboost", "scikit-learn", "pandas"] });
+            pyodideInstance.setStdout({batched(s:string) {console.log("batched out:", s)}})
+
             console.log("Loaded Pyodide and packages");
 
             setPyodide(pyodideInstance);
@@ -43,25 +62,21 @@ export function usePredict() {
             const buffer = await response.arrayBuffer();
 
             await pyodideInstance.unpackArchive(buffer, "zip");
-            console.log("Unpacking Python code");   
+            console.log("Unpacking Python code");
 
             pyodideInstance.runPython(`exec(open('simple.py').read())`)
 
+
         };
 
-        loadPyodideAndPackages();
+        loadPyodideAndPackages().then(() => loadModel().then(() => setLoading(false)))
+
     }, []);
 
-    useEffect(() => {
-        if (model !== null && pyodide !== null )
-        setLoading(false)
-    },
-    [model, pyodide]
-)
 
-    const predict = (data: any[]) : number =>  {
+    const predict = (data: any[]): number => {
         const simple = pyodide.pyimport('simple');
-
+        console.log("Predict called")
         return simple.predict(model, data) as number
     }
 
