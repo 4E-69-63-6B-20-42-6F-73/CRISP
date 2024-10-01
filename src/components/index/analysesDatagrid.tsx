@@ -9,6 +9,9 @@ import {
   TableColumnDefinition,
   createTableColumn,
   TableCellLayout,
+  TagGroup,
+  Tag,
+  Avatar,
 } from "@fluentui/react-components";
 import { Analyse } from "../../types";
 import { useNavigate } from "../../router";
@@ -49,7 +52,27 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
       renderHeaderCell: () => "Files",
       renderCell: (item) => (
         <TableCellLayout>
-          {item.files.map((x) => x.fileName).join(", ")}
+          <TagGroup>
+            {
+              item.files.map(x => 
+                <Tag
+            
+                key={x.fileName}
+                shape="rounded"
+                media={
+                  <Avatar
+                    aria-hidden
+                    initials={x.fileName.split(".").pop()}
+                    color="colorful"
+                  />
+                }
+                value={x.fileName}
+              >
+                {x.fileName}
+              </Tag>
+              )
+            }
+          </TagGroup>
         </TableCellLayout>
       ),
     }),

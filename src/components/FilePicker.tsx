@@ -81,7 +81,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                   media={
                     <Avatar
                       aria-hidden
-                      name={file.name.split(".").pop()}
+                      initials={file.name.split(".").pop()}
                       color="colorful"
                     />
                   }
