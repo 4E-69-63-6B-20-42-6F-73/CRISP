@@ -1,4 +1,3 @@
-import { ThemeProvider } from '@fluentui/react';
 import { DonutChart, IChartProps } from '@fluentui/react-charting';
 import { getClusterColor } from './clusterColerUtils';
 
