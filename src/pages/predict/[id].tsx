@@ -7,7 +7,7 @@ import {
 } from "@/stores/ApplicationStore";
 
 import { useNavigate, useParams } from "@/router";
-import { usePredict } from "@/model/usePredict";
+
 
 export default function Predict() {
   const params = useParams("/predict/:id");
@@ -16,50 +16,43 @@ export default function Predict() {
   const navigate = useNavigate();
 
   const addPrediction = useAddPrediction();
-  const [loading, predict] = usePredict()
-  const [isPredicting, setIsPredicting] = useState(false)
-
+  const [text, setText] = useState(getText("", 0,0))
   const analyse = useGetAnalysesById(id);
 
-  if (analyse.prediction !== undefined){
+  const data = analyse.files
+    .flatMap(x => x.content as any[])
+    .map(x => Object.values(x) as any[])
+
+  if (analyse.prediction !== undefined) {
     navigate("/detail/:id", { params: { id: id.toString() } });
   }
 
   useEffect(() => {
-    if (!loading) {
-      setIsPredicting(true)
+      const worker = new Worker("/CRISP/web_model/predictWorker.js");
+      worker.postMessage({ data });
 
-      const predictions = analyse.files
-      .flatMap(x => x.content as any[])
-      .map(x => Object.values(x) as any[])
-      .map((data) => {
-          const patientId = data[0];
-          try {
-              const prediction = predict(data);
-              return { patientId, prediction };
-          } catch (error) {
-              console.error(`Error predicting for patient ${patientId}:`, error);
-              return { patientId, prediction: -1 };
-          }
-      });
-  
-      
-        addPrediction(id, predictions)
-        setIsPredicting(false)
-    }
-  }, [loading])
+      worker.onmessage = (event) => {
+        const { type, index, total, predictions: workerPredictions } = event.data;
 
+        if (type === "loading") {
+          setText(getText("loading", index, total)); 
+        }
+        if (type === "progress") {
+          setText(getText("predicting", index, total)); 
 
-  if (loading) {
-    return <h1>Loading....</h1>
-  }
-  else if (isPredicting) 
-    {
-      return <h1>Predicting....</h1>
-    }
-  else {
-    return navigate("/detail/:id", { params: { id: id.toString() } }); // TODO Change...
-  }
+        } else if (type === "done") {
+          addPrediction(id, workerPredictions);
+          worker.terminate(); 
+          navigate("/detail/:id", { params: { id: id.toString() } });
+        }
+      };
+
+      return () => {
+        worker.terminate();
+      };
+    
+  }, []);
+
   return (
     <div
       style={{
@@ -78,9 +71,9 @@ export default function Predict() {
           flexDirection: "column",
         }}
       >
-        {/* <h3>{text.line3}</h3>
+        <h3>{text.line3}</h3>
         <h2>{text.line2}</h2>
-        <h1>{text.line1}</h1> */}
+        <h1>{text.line1}</h1>
       </div>
 
       <ProgressBar style={{ width: "50%" }} />
@@ -89,34 +82,21 @@ export default function Predict() {
   );
 }
 
-// type State = "extracting" | "loading" | "predicting";
 
-// const getText = (state: State, predicted: number, total: number) => {
-//   switch (state) {
-//     case "extracting":
-//       return { line1: "Extracting data", line2: "", line3: "" };
-//     case "loading":
-//       return { line1: "Loading model", line2: "Extracting data", line3: "" };
-//     case "predicting":
-//       return {
-//         line1: `Predicting ${predicted + 1} / ${total}`,
-//         line2: "Loading model",
-//         line3: "Extracting data",
-//       };
-//     default:
-//       return { line1: "", line2: "", line3: "" };
-//   }
-// };
-
-// async function* predictor() {
-//   yield new Promise<State>((resolve) =>
-//     setTimeout(() => resolve("extracting"), 500)
-//   );
-
-//   yield new Promise<State>((resolve) =>
-//     setTimeout(() => resolve("loading"), 1000)
-//   );
-//   yield new Promise<State>((resolve) =>
-//     setTimeout(() => resolve("predicting"), 2000)
-//   );
-// }
+const getText = (state: "loading" | "loaded" | "predicting" | "done" | "", predicted: number, total: number) => {
+  switch (state) {
+    case "":
+    case "loading":
+      return { line1: "Loading model", line2: "", line3: "" };
+    case "loaded":
+      return { line1: "Model loaded", line2: "Loading model", line3: "" };
+    case "predicting":
+      return {
+        line1: `Predicting ${predicted + 1} / ${total}`,
+        line2: "Model loaded",
+        line3: "Loading model",
+      };
+    default:
+      return { line1: "", line2: "", line3: "" };
+  }
+};
