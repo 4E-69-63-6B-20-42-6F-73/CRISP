@@ -6,7 +6,6 @@ import {
   Field,
   Input,
   Textarea,
-  Button,
   tokens,
 } from "@fluentui/react-components";
 import { AddFilled } from "@fluentui/react-icons";
@@ -16,6 +15,7 @@ import { FilePicker } from "@/components/FilePicker";
 import { useState } from "react";
 import { useAddAnalyse } from "@/stores/ApplicationStore";
 import extractContent from "@/utils/extractContent";
+import SpinnerButton from "@/components/SpinnerButton";
 
 
 const useClasses = makeStyles({
@@ -59,7 +59,7 @@ export default function Index() {
         }))
       )
     });
-  
+
     navigate("/predict/:id", { params: { id: id.toString() } });
   };
 
@@ -98,14 +98,14 @@ export default function Index() {
           />
 
           <div className={classes.divCreateButton}>
-            <Button
+            <SpinnerButton
               appearance="primary"
               icon={<AddFilled />}
               disabled={name === "" || files.length === 0}
               onClick={handleCreate}
             >
               Create
-            </Button>
+            </SpinnerButton>
           </div>
         </div>
       </div>
