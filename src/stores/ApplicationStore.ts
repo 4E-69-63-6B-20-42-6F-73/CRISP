@@ -12,36 +12,7 @@ interface ApplicationState {
 const useApplicationStore = create<ApplicationState>()(
   persist(
     (set) => ({
-      analyses: [
-        {
-          id: 1,
-          name: "Test",
-          description: "",
-          created: new Date(2021, 4, 27),
-          files: [],
-          prediction: [
-            { patientId: "1", prediction: 1 },
-            { patientId: "2", prediction: 2 },
-            { patientId: "3", prediction: 3 },
-            { patientId: "4", prediction: 4 },
-          ],
-        },
-        {
-          id: 2,
-          name: "Test2",
-          description: "",
-          created: new Date(2023, 5, 13),
-          files: [],
-        },
-        {
-          id: 3,
-          name: "Test3",
-          description: "gfdgsdfg",
-          created: new Date(2023, 4, 5),
-          files: [],
-        },
-      ],
-
+      analyses: [],
       addAnalyse: (analyse: Omit<Analyse, "id">) => {
         let newId: number = 0;
         set((state) => {
@@ -73,7 +44,7 @@ const useApplicationStore = create<ApplicationState>()(
     }),
     {
       name: 'application-store',
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.analyses = state.analyses.map((analyse) => ({
