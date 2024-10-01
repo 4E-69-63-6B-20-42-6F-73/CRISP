@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "traceResolution": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [
