@@ -3,19 +3,56 @@ import {
   BreadcrumbItem,
   BreadcrumbButton,
   BreadcrumbDivider,
+  makeStyles,
+  tokens,
 } from "@fluentui/react-components";
 import { useNavigate, useParams } from "../../router";
 import { useGetAnalysesById } from "../../stores/ApplicationStore";
+import DetailDataGrid from "@/components/detail/detailDatagrid";
+import { DonutChartWrapper } from "@/components/detail/DonutChartWrapper";
+import { DetailUmap } from "@/components/detail/DetailUmap";
+
+
+const useClasses = makeStyles({
+  div: {
+    background: tokens.colorNeutralBackground1,
+    borderRadius: tokens.borderRadiusXLarge,
+    width: "200px",
+    height: "200px",
+    padding: "12px",
+  },
+  datagrid: {
+    maxWidth: "1000px",
+    width: "-webkit-fill-available",
+    background: tokens.colorNeutralBackground1,
+    borderRadius: tokens.borderRadiusLarge,
+    padding: "12px",
+    marginTop: "12px",
+  },
+});
+
+
 
 export default function Details() {
+  const classes = useClasses();
+
   const params = useParams("/detail/:id");
   const id = Number(params.id);
 
   const navigate = useNavigate();
 
   const analyse = useGetAnalysesById(id);
+  const predictions = analyse.prediction ?? []
 
-  const details = analyse.prediction?.map( x =>  <p> { x.patientId } { x.prediction } </p>)
+  const data = analyse.files
+    .flatMap(x => x.content as any[])
+    .map(x => Object.values(x) as any[])
+
+
+  const clustering = predictions.map(x => x.prediction)
+  const patients = predictions.map(x => x.patientId)
+
+  const counts = count(clustering)
   return (
     <>
       <Breadcrumb>
@@ -30,7 +67,43 @@ export default function Details() {
         </BreadcrumbItem>
       </Breadcrumb>
 
-      {details}
+      <h1>Summary</h1>
+      <div style={{ display: "flex", flexDirection: "row", gap: "12px", alignItems: "center" }}>
+        <div className={classes.div}>
+          <h2 style={{marginTop:"0px"}}><b>{counts.sum}</b> Patients</h2>
+          <ul style={{lineHeight:"80%"}}>
+            <li><p><b>{ counts.counts[1] }</b> Cluster 1 </p></li>
+            <li><p><b>{ counts.counts[2] }</b> Cluster 2 </p></li>
+            <li><p><b>{ counts.counts[3] }</b> Cluster 3 </p></li>
+            <li><p><b>{ counts.counts[4] }</b> Cluster 4 </p></li>
+          </ul>
+        </div>
+        
+        <div className={classes.div}>
+          <DonutChartWrapper counts={counts.counts}/>
+        </div>
+        <div className={classes.div}>
+          <DetailUmap data={data} clusters={clustering} patientIds={patients}/>
+        </div>
+      </div>
+
+      <h1>Patients</h1>
+
+      <div className={classes.datagrid}>
+        <DetailDataGrid items={analyse.prediction ?? []} />
+      </div>
     </>
   );
+}
+function count(data: number[]) {
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+  let sum = data.length;
+
+  data.forEach((item) => {
+    if (item in counts) {
+      counts[item as keyof typeof counts] += 1;
+    }
+  });
+
+  return { counts, sum };
 }
