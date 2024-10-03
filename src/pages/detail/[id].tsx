@@ -5,6 +5,8 @@ import {
   BreadcrumbDivider,
   makeStyles,
   tokens,
+  Toolbar,
+  ToolbarButton,
 } from "@fluentui/react-components";
 import { useNavigate, useParams } from "../../router";
 import { useGetAnalysesById } from "../../stores/ApplicationStore";
@@ -12,6 +14,10 @@ import DetailDataGrid from "@/components/detail/detailDatagrid";
 import { DonutChartWrapper } from "@/components/detail/DonutChartWrapper";
 import { DetailUmap } from "@/components/detail/DetailUmap";
 
+import {
+  ArrowDownload24Regular
+} from "@fluentui/react-icons";
+import { exportJsonToExcel } from "@/utils/exportToExcel";
 
 const useClasses = makeStyles({
   div: {
@@ -27,7 +33,6 @@ const useClasses = makeStyles({
     background: tokens.colorNeutralBackground1,
     borderRadius: tokens.borderRadiusLarge,
     padding: "12px",
-    marginTop: "12px",
   },
 });
 
@@ -70,24 +75,37 @@ export default function Details() {
       <h1>Summary</h1>
       <div style={{ display: "flex", flexDirection: "row", gap: "12px", alignItems: "center" }}>
         <div className={classes.div}>
-          <h2 style={{marginTop:"0px"}}><b>{counts.sum}</b> Patients</h2>
-          <ul style={{lineHeight:"80%"}}>
-            <li><p><b>{ counts.counts[1] }</b> Cluster 1 </p></li>
-            <li><p><b>{ counts.counts[2] }</b> Cluster 2 </p></li>
-            <li><p><b>{ counts.counts[3] }</b> Cluster 3 </p></li>
-            <li><p><b>{ counts.counts[4] }</b> Cluster 4 </p></li>
+          <h2 style={{ marginTop: "0px" }}><b>{counts.sum}</b> Patients</h2>
+          <ul style={{ lineHeight: "80%" }}>
+            <li><p><b>{counts.counts[1]}</b> Cluster 1 </p></li>
+            <li><p><b>{counts.counts[2]}</b> Cluster 2 </p></li>
+            <li><p><b>{counts.counts[3]}</b> Cluster 3 </p></li>
+            <li><p><b>{counts.counts[4]}</b> Cluster 4 </p></li>
           </ul>
         </div>
-        
+
         <div className={classes.div}>
-          <DonutChartWrapper counts={counts.counts}/>
+          <DonutChartWrapper counts={counts.counts} />
         </div>
         <div className={classes.div}>
-          <DetailUmap data={data} clusters={clustering} patientIds={patients}/>
+          <DetailUmap data={data} clusters={clustering} patientIds={patients} />
         </div>
       </div>
 
-      <h1>Patients</h1>
+      <div style={{ display: "flex", flexDirection: "row", marginTop: "12px" }}>
+        <h1>Patients</h1>
+        <Toolbar aria-label="Default" style={{
+          display: "flex",
+          justifyContent: "left"
+        }}>
+
+          <ToolbarButton
+            aria-label="Export to excel"
+            icon={<ArrowDownload24Regular />}
+            onClick={() => exportJsonToExcel(predictions, "Predictions", "Predictions.xlsx")}
+          />
+        </Toolbar>
+      </div>
 
       <div className={classes.datagrid}>
         <DetailDataGrid items={analyse.prediction ?? []} />
