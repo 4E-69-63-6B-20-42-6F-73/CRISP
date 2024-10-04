@@ -4,11 +4,22 @@ import { routes } from "@generouted/react-router";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "./main.css";
+import { useHasLoaded } from "./stores/ApplicationStore";
 
 const router = createBrowserRouter(routes, { basename: "/CRISP/" });
 
+const LoadingCheck = () => {
+  const hasLoaded = useHasLoaded()
+
+  if (!hasLoaded) {
+    return <p>Loading...</p>;
+  }
+
+  return <RouterProvider router={router} />;
+};
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <LoadingCheck/>
   </StrictMode>
 );

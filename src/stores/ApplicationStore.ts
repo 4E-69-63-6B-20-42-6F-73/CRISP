@@ -38,11 +38,20 @@ interface ApplicationState {
   analyses: Analyse[];
   addAnalyse: (analyse: Omit<Analyse, "id">) => number;
   addPrediction: (id: number, predictions: Prediction[]) => void;
+
+  hasLoaded: boolean //Check to see if the data has been loaded
+  setHasLoaded: (state: boolean) => void
 }
 
 const useApplicationStore = create<ApplicationState>()(
   persist(
     (set) => ({
+      hasLoaded: false,
+      setHasLoaded: (state:boolean) => {
+        set({
+          hasLoaded: state
+        });
+      },
       analyses: [],
       addAnalyse: (analyse: Omit<Analyse, "id">) => {
         let newId: number = 0;
@@ -76,6 +85,7 @@ const useApplicationStore = create<ApplicationState>()(
       name: 'application-store',
       storage: createJSONStorage(() => idbStorage),
       onRehydrateStorage: () => (state) => {
+        state?.setHasLoaded(true) 
         if (state) {
           state.analyses = state.analyses.map((analyse) => ({
             ...analyse,
@@ -107,4 +117,5 @@ const useGetAnalysesById = (id: number) => {
 const useAddAnalyse = () => useApplicationStore((s) => s.addAnalyse);
 const useAddPrediction = () => useApplicationStore((s) => s.addPrediction);
 
-export { useAnalyses, useAddAnalyse, useGetAnalysesById, useAddPrediction };
+const useHasLoaded = () => useApplicationStore((s) => s.hasLoaded);
+export { useHasLoaded, useAnalyses, useAddAnalyse, useGetAnalysesById, useAddPrediction };
