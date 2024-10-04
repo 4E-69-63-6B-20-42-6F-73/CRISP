@@ -1,7 +1,38 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from 'zustand/middleware';
-
 import { Analyse, Prediction } from "../types";
+import { openDB } from "idb";
+
+const dbPromise = openDB("zustand-db", 1, {
+  upgrade(db) {
+    db.createObjectStore("zustand-store");
+  },
+});
+
+const idbSetItem = async (key: string, value: any) => {
+  const db = await dbPromise;
+  return db.put("zustand-store", value, key);
+};
+
+const idbGetItem = async (key: string) => {
+  const db = await dbPromise;
+  return db.get("zustand-store", key);
+};
+
+const idbStorage = {
+  getItem: async (key: string) => {
+    const value = await idbGetItem(key);
+    return value ? JSON.stringify(value) : null;
+  },
+  setItem: async (key: string, value: string) => {
+    const parsedValue = JSON.parse(value);
+    await idbSetItem(key, parsedValue);
+  },
+  removeItem: async (key: string) => {
+    const db = await dbPromise;
+    return db.delete("zustand-store", key);
+  },
+};
 
 interface ApplicationState {
   analyses: Analyse[];
@@ -16,10 +47,9 @@ const useApplicationStore = create<ApplicationState>()(
       addAnalyse: (analyse: Omit<Analyse, "id">) => {
         let newId: number = 0;
         set((state) => {
-          const maxId =
-            state.analyses.length > 0
-              ? Math.max(...state.analyses.map((a) => a.id))
-              : 0;
+          const maxId = state.analyses.length > 0
+            ? Math.max(...state.analyses.map((a) => a.id))
+            : 0;
 
           newId = maxId + 1;
 
@@ -35,16 +65,16 @@ const useApplicationStore = create<ApplicationState>()(
           analyses: state.analyses.map((analyse) =>
             analyse.id === id
               ? {
-                ...analyse,
-                prediction: [...(analyse.prediction || []), ...predictions],
-              }
+                  ...analyse,
+                  prediction: [...(analyse.prediction || []), ...predictions],
+                }
               : analyse
           ),
         })),
     }),
     {
       name: 'application-store',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => idbStorage),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.analyses = state.analyses.map((analyse) => ({
@@ -52,13 +82,11 @@ const useApplicationStore = create<ApplicationState>()(
             created: new Date(analyse.created),
             files: analyse.files.map((file) => ({
               ...file,
-              content: JSON.parse(JSON.stringify(file.content)), 
-              // Hmmm... This feels hacky. Find a better solutions that doesn't involve making it json again.
-              // But it's kinda the same with Date...
+              content: file.content,
             })),
           }));
         }
-      }
+      },
     }
   )
 );
