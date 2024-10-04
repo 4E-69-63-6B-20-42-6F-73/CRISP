@@ -70,7 +70,7 @@ async function loadPyodideWithEverything() {
 
 
 async function loadTFJSModel() {
-    const model = await self.tf.loadLayersModel("encoder_tfjs/model.json");
+    const model = await self.tf.loadGraphModel("encoder/model.json");
 
     model.encoder_j = (data) => {
         console.log("Encoding data:", data);
@@ -79,7 +79,7 @@ async function loadTFJSModel() {
         const catTensor = self.tf.tensor([json["cat"].map((value) => parseFloat(value))]);
         const numTensor = self.tf.tensor([json["num"].map((value) => parseFloat(value))]);
         
-        const prediction = model.predict([catTensor, numTensor]).arraySync();
+        const prediction = model.predict([numTensor, catTensor]).arraySync();
         return JSON.stringify(prediction);
     };
     
