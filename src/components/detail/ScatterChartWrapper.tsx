@@ -1,5 +1,6 @@
 import { IChartProps, LineChart } from '@fluentui/react-charting';
 import { getClusterColor } from './clusterColerUtils';
+import { useMeasure } from "@uidotdev/usehooks";
 
 //Find way to hide vertical dashes and axis
 
@@ -16,6 +17,8 @@ interface Point {
 
 
 export function ScatterChartWrapper({ points }: ScatterChartWrapperProps) {
+  const [ref, { width, height }] = useMeasure(); 
+
   const data: IChartProps = {
     chartTitle: 'Line Chart',
     lineChartData: points.map(x => ({  data: [
@@ -26,13 +29,14 @@ export function ScatterChartWrapper({ points }: ScatterChartWrapperProps) {
   };
 
   return (
+    <div ref={ref} style={{width: '100%', height: '100%' }}>
       <LineChart 
         data={data}
         hideLegend
-        width={160}
-        height={160}
-        enablePerfOptimization
-        enableReflow 
+        width={width ?? 160}
+        height={(height ?? 160 )}
       />
+    </div>
+
   );  
 }
