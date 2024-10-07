@@ -1,13 +1,12 @@
 import { UMAP } from "umap-js";
 import { ScatterChartWrapper } from "./ScatterChartWrapper";
 import { useEffect, useRef, useState } from "react";
-import { makeStyles, Spinner, tokens } from "@fluentui/react-components";
+import { Spinner, tokens } from "@fluentui/react-components";
 
 import { Toolbar, ToolbarButton, Caption1Strong } from "@fluentui/react-components";
 
 import {
     FullScreenMaximize24Regular,
-    Settings24Regular,
     ArrowDownload24Regular
 } from "@fluentui/react-icons";
 
@@ -24,13 +23,18 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [points, setPoints] = useState<Point[]>([])
 
-    data = data.map(innerList => innerList.slice(1)); // Remove patient number
-
     useEffect(() => {
-        new UMAP({
-            nComponents: 2,
-            nNeighbors: data.length < 50 ? data.length - 1 : 50,
-        }).fitAsync(data).then(embedding => setPoints(mapEmbeddingToPoints(embedding, clusters, patientIds)))
+
+        async function doUmap() {
+            const withoutPatient = data.map(innerList => innerList.slice(1)); // Remove patient number
+            const umap = new UMAP({
+                nComponents: 2,
+                nNeighbors: data.length < 50 ? data.length - 1 : 50,
+            })
+            const embedding = await umap.fitAsync(withoutPatient)
+            setPoints(mapEmbeddingToPoints(embedding, clusters, patientIds))
+        }
+        doUmap()
     }, [])
 
 
@@ -82,7 +86,7 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
         }
     };
 
-    return <div ref={wrapperRef} id="test" style={{ height: "240px", width: "200px", margin: "12px", backgroundColor: tokens.colorNeutralBackground1, padding: isFullscreen ? "12px" : "" }}>
+    return <div ref={wrapperRef} id="test" style={{ height: "240px", width: "200px", backgroundColor: tokens.colorNeutralBackground1, padding: isFullscreen ? "12px" : "" }}>
         {points.length !== 0 ?
             <>
                 <Toolbar aria-label="Default" style={{
@@ -93,10 +97,6 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
                     <Caption1Strong style={{ flexGrow: 1 }}>
                         UMAP
                     </Caption1Strong>
-                    <ToolbarButton
-                        aria-label="Open settings"
-                        icon={<Settings24Regular />}
-                    />
                     <ToolbarButton
                         aria-label="Toggle fullscreen"
                         icon={<FullScreenMaximize24Regular />}
