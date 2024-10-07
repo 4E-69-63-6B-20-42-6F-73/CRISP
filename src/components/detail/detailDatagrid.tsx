@@ -36,7 +36,7 @@ const DetailDataGrid: React.FC<{ items: Prediction[] }> = ({ items }) => {
       sortable
       getRowId={(item) => item.patientId.toString()}
       focusMode="composite"
-      style={{ minWidth: "550px", height:"420px", overflow: "auto" }}
+      style={{ minWidth: "550px" }}
     >
       <DataGridHeader>
         <DataGridRow>

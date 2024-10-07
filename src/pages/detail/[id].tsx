@@ -30,9 +30,12 @@ const useClasses = makeStyles({
   datagrid: {
     maxWidth: "1000px",
     width: "-webkit-fill-available",
+    height: "368px",
+    overflow: "auto",
     background: tokens.colorNeutralBackground1,
     borderRadius: tokens.borderRadiusLarge,
     padding: "12px",
+    
   },
 });
 
