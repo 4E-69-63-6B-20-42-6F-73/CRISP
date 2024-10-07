@@ -19,7 +19,7 @@ const SpinnerButton: React.FC<SpinnerButtonProps> = ({
     const [loading, setLoading] = useState(false)
 
     const handleClick = async () => {
-        try {
+        try {   
             setLoading(true);
             await onClick();  
         } finally {

@@ -24,7 +24,7 @@ const useClasses = makeStyles({
     background: tokens.colorNeutralBackground1,
     borderRadius: tokens.borderRadiusXLarge,
     width: "200px",
-    height: "200px",
+    height: "240px",
     padding: "12px",
   },
   datagrid: {
@@ -47,12 +47,13 @@ export default function Details() {
   const navigate = useNavigate();
 
   const analyse = useGetAnalysesById(id);
-  const predictions = analyse.prediction ?? []
+  const predictions = (analyse.prediction ?? [])
+    .filter(x => x.prediction !== -1)
 
   const data = analyse.files
     .flatMap(x => x.content as any[])
     .map(x => Object.values(x) as any[])
-
+    .filter((_, i) => (analyse.prediction ?? [])[i].prediction !== -1)
 
   const clustering = predictions.map(x => x.prediction)
   const patients = predictions.map(x => x.patientId)
