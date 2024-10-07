@@ -89,6 +89,7 @@ const useApplicationStore = create<ApplicationState>()(
         if (state) {
           state.analyses = state.analyses.map((analyse) => ({
             ...analyse,
+            // For some reason analyse.created is sometimes still a string...
             created: new Date(analyse.created),
             files: analyse.files.map((file) => ({
               ...file,

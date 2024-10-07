@@ -43,7 +43,7 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
         new Date(a.created).getTime() - new Date(b.created).getTime(),
       renderHeaderCell: () => "Date",
       renderCell: (item) => (
-        <TableCellLayout>{item.created.toDateString()}</TableCellLayout>
+        <TableCellLayout>{new Date(item.created).toDateString()}</TableCellLayout>
       ),
     }),
     createTableColumn<Analyse>({
