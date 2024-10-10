@@ -32,7 +32,7 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
                 nNeighbors: data.length < 50 ? data.length - 1 : 50,
             })
             const embedding = await umap.fitAsync(withoutPatient)
-            setPoints(mapEmbeddingToPoints(embedding, clusters, patientIds))
+            setPoints(detectOutliers(mapEmbeddingToPoints(embedding, clusters, patientIds)))
         }
         doUmap()
     }, [])
@@ -121,6 +121,7 @@ interface Point {
     y: number;
     cluster: number;
     patientId: string;
+    isOutlier: boolean;
 }
 
 function mapEmbeddingToPoints(embedding: number[][], clusters: number[], patientIds: string[]): Point[] {
@@ -132,7 +133,50 @@ function mapEmbeddingToPoints(embedding: number[][], clusters: number[], patient
         y: coordinate[1],
         cluster: clusters[index],
         patientId: patientIds[index],
+        isOutlier: false
     }));
+
+    return points;
+}
+
+
+function calculateMean(points: Point[]): { meanX: number, meanY: number } {
+    const sumX = points.reduce((acc, point) => acc + point.x, 0);
+    const sumY = points.reduce((acc, point) => acc + point.y, 0);
+    return {
+        meanX: sumX / points.length,
+        meanY: sumY / points.length,
+    };
+}
+
+function calculateStandardDeviation(points: Point[], meanX: number, meanY: number): number {
+    const variance = points.reduce((acc, point) => {
+        const distanceSquared = Math.pow(point.x - meanX, 2) + Math.pow(point.y - meanY, 2);
+        return acc + distanceSquared;
+    }, 0) / points.length;
+    
+    return Math.sqrt(variance);
+}
+
+function detectOutliers(points: Point[]): Point[] {
+    const clusters = new Map<number, Point[]>();
+
+    points.forEach(point => {
+        if (!clusters.has(point.cluster)) {
+            clusters.set(point.cluster, []);
+        }
+        clusters.get(point.cluster)?.push(point);
+    });
+
+    clusters.forEach((clusterPoints, _) => {
+        const { meanX, meanY } = calculateMean(clusterPoints);
+        const sd = calculateStandardDeviation(clusterPoints, meanX, meanY);
+
+        clusterPoints.forEach(point => {
+            const distance = Math.sqrt(Math.pow(point.x - meanX, 2) + Math.pow(point.y - meanY, 2));
+            point.isOutlier = distance > 2 * sd;
+        });
+    });
 
     return points;
 }

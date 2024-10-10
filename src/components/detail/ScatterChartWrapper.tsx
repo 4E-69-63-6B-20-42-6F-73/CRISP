@@ -13,6 +13,7 @@ interface Point {
   y: number;
   cluster: number;
   patientId: string;
+  isOutlier: boolean
 }
 
 
@@ -21,12 +22,12 @@ export function ScatterChartWrapper({ points }: ScatterChartWrapperProps) {
 
   const yMax = Math.max(...points.map(x => x.y))
   const yMin = Math.min(...points.map(x => x.y))
-  
+
   const data: IChartProps = {
     chartTitle: 'Line Chart',
     lineChartData: points.map(x => ({
       data: [
-        { x: x.x, y: x.y, xAxisCalloutData: 'No outlier', yAxisCalloutData: "Patient Id:" + x.patientId },
+        { x: x.x, y: x.y, xAxisCalloutData: x.isOutlier ? "Outlier" : 'No outlier', yAxisCalloutData: "Patient Id:" + x.patientId },
       ],
       legend: `Cluster ${x.cluster}`,
       color: getClusterColor(x.cluster)
