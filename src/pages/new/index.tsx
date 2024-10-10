@@ -8,7 +8,7 @@ import {
   Textarea,
   tokens,
 } from "@fluentui/react-components";
-import { AddFilled } from "@fluentui/react-icons";
+import { AddFilled, LightbulbFilamentRegular } from "@fluentui/react-icons";
 import { useNavigate } from "@/router";
 import { makeStyles } from "@fluentui/react-components";
 import { FilePicker } from "@/components/FilePicker";
@@ -16,7 +16,7 @@ import { useState } from "react";
 import { useAddAnalyse } from "@/stores/ApplicationStore";
 import extractContent from "@/utils/extractContent";
 import SpinnerButton from "@/components/SpinnerButton";
-
+import { Link } from "react-router-dom";
 
 const useClasses = makeStyles({
   divCreateButton: {
@@ -97,6 +97,20 @@ export default function Index() {
             onfilechange={(newFiles) => setFiles(newFiles)}
           />
 
+          <div style={{
+            border: "dashed",
+            borderColor: "gray",
+            borderWidth: "3px",
+            padding: "8px",
+            borderRadius: "8px",
+            color: "gray",
+            display:"flex",
+            alignItems: "center"
+          }}>
+            <LightbulbFilamentRegular fontSize={24} />
+            <div>
+              <b>Hint</b> Use <Link to="/web_model/template.xlsx" target="_blank" download>this template</Link> to make sure you have the right data</div>
+          </div>
           <div className={classes.divCreateButton}>
             <SpinnerButton
               appearance="primary"
