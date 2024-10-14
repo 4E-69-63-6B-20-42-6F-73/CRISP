@@ -1,8 +1,12 @@
 import { IChartProps, LineChart } from "@fluentui/react-charting";
 import { getClusterColor } from "./clusterColerUtils";
 import { useMeasure } from "@uidotdev/usehooks";
+import { useEffect } from "react";
 
 //Find way to hide vertical dashes and axis
+
+// With this there are no scrollbars and everything is visible
+import "./ScatterChartWrapper-hack.css";
 
 interface ScatterChartWrapperProps {
     points: Point[];
@@ -21,6 +25,10 @@ export function ScatterChartWrapper({ points }: ScatterChartWrapperProps) {
 
     const yMax = Math.max(...points.map((x) => x.y));
     const yMin = Math.min(...points.map((x) => x.y));
+
+    useEffect(() => {
+        console.log(width, height);
+    }, [width, height]);
 
     const data: IChartProps = {
         chartTitle: "Line Chart",
@@ -44,7 +52,7 @@ export function ScatterChartWrapper({ points }: ScatterChartWrapperProps) {
                 <LineChart
                     data={data}
                     hideLegend
-                    width={width ?? 160}
+                    width={160}
                     height={height ?? 160}
                     enableReflow={true}
                     yMaxValue={yMax}
