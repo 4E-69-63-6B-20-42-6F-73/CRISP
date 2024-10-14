@@ -26,10 +26,6 @@ export function ScatterChartWrapper({ points }: ScatterChartWrapperProps) {
     const yMax = Math.max(...points.map((x) => x.y));
     const yMin = Math.min(...points.map((x) => x.y));
 
-    useEffect(() => {
-        console.log(width, height);
-    }, [width, height]);
-
     const data: IChartProps = {
         chartTitle: "Line Chart",
         lineChartData: points.map((x) => ({
