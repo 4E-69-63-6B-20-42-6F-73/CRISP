@@ -19,7 +19,8 @@ const useClasses = makeStyles({
     button: {
         background: "linear-gradient(128.84deg,#0f6cbd 20.46%,#3c45ab 72.3%)", //TODO use tokens??
         ":hover": {
-            background: "linear-gradient(128.84deg, #025caa 20.46%, #222b91 72.3%);",
+            background:
+                "linear-gradient(128.84deg, #025caa 20.46%, #222b91 72.3%);",
         },
     },
     datagrid: {
@@ -50,21 +51,21 @@ export default function Index() {
                     appearance="primary"
                     shape="circular"
                     icon={<AddFilled />}
-                    onClick={() => navigate("/new")}>
+                    onClick={() => navigate("/new")}
+                >
                     Create new
                 </Button>
             </div>
 
-            {
-                analyses.length !== 0 ?
-                    <div className={classes.datagrid}>
-                        <AnalyseDataGrid items={analyses} />
-                    </div> :
-                    <div style={{ display: "flex", justifyContent: "center" }}>
-                        <p>No analyses yet. Use Create new to create a new one!</p>
-                    </div>
-            }
-            
+            {analyses.length !== 0 ? (
+                <div className={classes.datagrid}>
+                    <AnalyseDataGrid items={analyses} />
+                </div>
+            ) : (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                    <p>No analyses yet. Use Create new to create a new one!</p>
+                </div>
+            )}
         </>
     );
 }

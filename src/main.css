@@ -2,15 +2,15 @@ html,
 body,
 #root,
 #root > div {
-  height: 100%;
-  overflow: auto;
+    height: 100%;
+    overflow: auto;
 }
 
 body {
-  margin: 0;
-  min-width: 600px;
+    margin: 0;
+    min-width: 600px;
 }
 
 #root > div {
-  background-color: var(--colorNeutralBackground6);
+    background-color: var(--colorNeutralBackground6);
 }

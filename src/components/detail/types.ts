@@ -3,7 +3,6 @@ interface Point {
     y: number;
     cluster: number;
     patientId: string;
-  }
+}
 
-  
-  export type { Point}
+export type { Point };

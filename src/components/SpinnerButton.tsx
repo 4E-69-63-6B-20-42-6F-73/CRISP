@@ -16,12 +16,12 @@ const SpinnerButton: React.FC<SpinnerButtonProps> = ({
     disabled,
     onClick,
 }) => {
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const handleClick = async () => {
-        try {   
+        try {
             setLoading(true);
-            await onClick();  
+            await onClick();
         } finally {
             setLoading(false);
         }
@@ -31,7 +31,8 @@ const SpinnerButton: React.FC<SpinnerButtonProps> = ({
             appearance={appearance}
             disabled={loading || disabled}
             icon={loading ? <Spinner size="tiny" /> : icon}
-            onClick={handleClick}>
+            onClick={handleClick}
+        >
             {loading ? "Processing..." : children}
         </Button>
     );

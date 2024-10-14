@@ -56,15 +56,14 @@ export const Joints: Coordinate[] = [
     { id: "tarsometatarsaal L", x: 865, y: 1490, z: 40 },
     { id: "tarsometatarsaal R", x: 576, y: 1466, z: 40 },
     { id: "temporomandibulair L", x: 772, y: 194, z: 80 },
-    { id: "temporomandibulair R", x: 652, y: 210, z: 80 },  
-    { id: "heup L", x: 629,y: 791, z: 0 },  
-    { id: "heup R", x: 799,y: 783, z: 0 },  
+    { id: "temporomandibulair R", x: 652, y: 210, z: 80 },
+    { id: "heup L", x: 629, y: 791, z: 0 },
+    { id: "heup R", x: 799, y: 783, z: 0 },
 ];
 
-
 interface Coordinate {
-  id: string;
-  x: number;
-  y: number;
-  z: number;
+    id: string;
+    x: number;
+    y: number;
+    z: number;
 }

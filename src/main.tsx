@@ -9,17 +9,17 @@ import { useHasLoaded } from "./stores/ApplicationStore";
 const router = createBrowserRouter(routes, { basename: "/CRISP/" });
 
 const LoadingCheck = () => {
-  const hasLoaded = useHasLoaded()
+    const hasLoaded = useHasLoaded();
 
-  if (!hasLoaded) {
-    return <p>Loading...</p>;
-  }
+    if (!hasLoaded) {
+        return <p>Loading...</p>;
+    }
 
-  return <RouterProvider router={router} />;
+    return <RouterProvider router={router} />;
 };
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <LoadingCheck/>
-  </StrictMode>
+    <StrictMode>
+        <LoadingCheck />
+    </StrictMode>,
 );
