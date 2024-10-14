@@ -8,10 +8,12 @@ export type Path =
   | `/detail/:id`
   | `/new`
   | `/predict/:id`
+  | `/reorder/:id`
 
 export type Params = {
   '/detail/:id': { id: string }
   '/predict/:id': { id: string }
+  '/reorder/:id': { id: string }
 }
 
 export type ModalPath = never
