@@ -3,12 +3,14 @@ import { Button, TagGroup, tokens } from "@fluentui/react-components";
 
 import {
   useGetAnalysesById,
+  useUpdateAnalyse,
 } from "@/stores/ApplicationStore";
 
 import { useNavigate, useParams } from "@/router";
 import { ToggableTag } from "@/components/reorder/ToggableTag";
 import { ClickableMannequin } from "@/components/ClickableMannequin/ClickableMannequin";
 import { expectedColumnInFile } from "@/orders";
+import setsAreEqual  from "@/utils/setsAreEqual";
 
 const numeric = ['PATNR', 'Leuko', 'Hb', 'MCV', 'Trom', 'Age', 'BSE']
 
@@ -21,6 +23,7 @@ export default function Reorder() {
   const navigate = useNavigate();
 
   const analyse = useGetAnalysesById(id);
+  const updateAnalyse = useUpdateAnalyse();
 
   // For now we assume that every files has the same columns
   const data = analyse.files[0].content.slice(0, 5)
@@ -33,8 +36,31 @@ export default function Reorder() {
       setOrder(order.filter(y => y !== x))
     }
     else {
+      const firstEmptyString = order.indexOf("")
+
+      if(firstEmptyString != -1){
+        const newOrder = [...order];
+        newOrder[firstEmptyString] = x;
+        setOrder(newOrder);
+      }
+      else {
       setOrder([...order, x])
     }
+    }
+  }
+
+  function replaceColumns(): void {
+    const updatedFiles = analyse.files.map(x => ({
+      ...x,
+      content: x.content.map(y => transform(y, order))
+    }));
+
+    const updatedAnalyse = {
+      ...analyse,
+      files: updatedFiles
+    };
+    updateAnalyse(updatedAnalyse)
+    navigate("/predict/:id", { params: { id: id.toString() } });
   }
 
   return (
@@ -71,13 +97,13 @@ export default function Reorder() {
           <div style={{ width: "fit-content", backgroundColor: tokens.colorNeutralBackground1, borderRadius: tokens.borderRadiusLarge }}>
             <table>
               <thead>
-                <tr>
+                <tr key="new">
                   <th> New columns </th>
-                  {order.map(x => <th key={x}>{x}</th>)}
+                  {order.map((x, index) => <th key={`new-${index}`}>{x}</th>)}
                 </tr>
-                <tr>
+                <tr key="old">
                   <th> Old columns </th>
-                  {oldColumns.map(x => <th key={x}>{x}</th>)}
+                  {oldColumns.map((x, index) => <th key={`old-${index}`}>{x}</th>)}
                 </tr>
               </thead>
               <tbody>
@@ -102,7 +128,7 @@ export default function Reorder() {
         display: "flex",
         justifyContent: "end",
       }}>
-        <Button appearance="primary" disabled={ !setsAreEqual(new Set(expectedColumnInFile), new Set(order)) }>
+        <Button appearance="primary" disabled={!setsAreEqual(new Set(expectedColumnInFile), new Set(order))} onClick={() => replaceColumns()}>
           Finish
         </Button>
 
@@ -111,13 +137,6 @@ export default function Reorder() {
     </>
   );
 }
-const setsAreEqual = (a: Set<string>, b: Set<string>): boolean => {
-  if (a.size !== b.size) return false;
-  for (let item of a) {
-    if (!b.has(item)) return false;
-  }
-  return true;
-};
 
 // We want to find the first X matching item between old and expected.
 function getInitialOrder(oldColumns: string[], expectedColumnInFile: string[]): string[] {
@@ -127,14 +146,30 @@ function getInitialOrder(oldColumns: string[], expectedColumnInFile: string[]): 
     const oldColumn = oldColumns[index];
     const expected = expectedColumnInFile[index];
 
-    if (oldColumn === expected){
+    if (oldColumn === expected) {
       initialOrder.push(oldColumn)
     }
-    else
-    {
-      break
+    else {
+      initialOrder.push("")
     }
-    
+
   }
   return initialOrder
+}
+
+
+// Rename each object property
+function transform(object: any, newProperties: string[]): any {
+  const transformed: any = {};
+
+  const keys = Object.keys(object);
+
+  for (let i = 0; i < keys.length && i < newProperties.length; i++) {
+    const oldKey = keys[i];
+    const newKey = newProperties[i];
+    const value = object[oldKey];
+    transformed[newKey] = value;
+  }
+
+  return transformed;
 }
