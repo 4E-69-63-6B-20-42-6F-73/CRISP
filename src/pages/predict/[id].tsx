@@ -7,7 +7,8 @@ import {
 } from "@/stores/ApplicationStore";
 
 import { useNavigate, useParams } from "@/router";
-import { expectedOrderForModel } from "@/orders";
+import { expectedColumnInFile, expectedOrderForModel } from "@/orders";
+import setsAreEqual from "@/utils/setsAreEqual";
 
 
 const reorderObjectValuesByKeyList = (obj: any, keyOrder: string[]): any[] => {
@@ -29,13 +30,15 @@ export default function Predict() {
     const data = analyse.files
         .flatMap(x => x.content as any[])
         .map((contentItem: any) => pre_process(contentItem));
-        // .map((contentItem: any) => reorderObjectValuesByKeyList(pre_process(contentItem), dataOrder));
-
-    if (analyse.prediction !== undefined) {
-        navigate("/detail/:id", { params: { id: id.toString() } });
-    }
 
     useEffect(() => {
+        if (analyse.prediction !== undefined) {
+            navigate("/detail/:id", { params: { id: id.toString() } });
+        }
+        if (!setsAreEqual(new Set(expectedColumnInFile), new Set(Object.keys(analyse.files[0].content[0])))) {
+            navigate("/reorder/:id", { params: { id: id.toString() } });
+        }
+
         const worker = new Worker("/CRISP/web_model/predictWorker.js");
         worker.postMessage({ data });
 
@@ -111,9 +114,9 @@ const getText = (state: "loading" | "loaded" | "predicting" | "done" | "", predi
 
 // Preprocess by duplicating keys with pijn or zwelling into _positieve and _negatieve and reorder as expected by the model.
 function pre_process(data: any) {
-    const copy = { ...data}
+    const copy = { ...data }
 
-    for (const key of  Object.keys(data)) {
+    for (const key of Object.keys(data)) {
         const value = copy[key];
 
         if (key.includes('Pijn') || key.includes('Zwelling')) {
