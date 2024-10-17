@@ -24,6 +24,7 @@ const useClasses = makeStyles({
         borderRadius: tokens.borderRadiusXLarge,
         width: "200px",
         height: "240px",
+        minHeight: "240px",
         padding: "12px",
     },
     datagrid: {

@@ -30,15 +30,15 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
     }, []);
 
     return (
-        <div>
+        <>
             {points.length !== 0 ? (
-                <div style={{ height: "200px" }}>
+                <div style={{ height: "inherit" }}>
                     <ScatterChartWrapper points={points} />
                 </div>
             ) : (
                 <div
                     style={{
-                        height: "200px",
+                        height: "inherit",
                         display: "flex",
                         justifyContent: "center",
                     }}
@@ -46,7 +46,7 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
                     <Spinner size="extra-large" />
                 </div>
             )}
-        </div>
+        </>
     );
 }
 
