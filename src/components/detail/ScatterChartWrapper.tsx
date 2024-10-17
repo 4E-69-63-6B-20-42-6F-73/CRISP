@@ -1,7 +1,6 @@
 import { IChartProps, LineChart } from "@fluentui/react-charting";
 import { getClusterColor } from "./clusterColerUtils";
 import { useMeasure } from "@uidotdev/usehooks";
-import { useEffect } from "react";
 
 //Find way to hide vertical dashes and axis
 
