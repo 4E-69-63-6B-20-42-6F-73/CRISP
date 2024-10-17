@@ -102,6 +102,8 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
                 width: "100%",
                 backgroundColor: tokens.colorNeutralBackground1,
                 padding: isFullscreen ? "12px" : "",
+                display: "flex",
+                flexDirection: "column",
             }}
         >
             <Toolbar
@@ -125,7 +127,16 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
                     onClick={downloadChart}
                 />
             </Toolbar>
-            <div style={{ height: "calc(100% - 40px)" }}>{children}</div>
+            <div
+                style={{
+                    flexGrow: "1",
+                    height: "100%",
+                    maxHeight: isFullscreen ? "unset" : "200px",
+                    flexShrink: "1",
+                }}
+            >
+                {children}
+            </div>
         </div>
     );
 }

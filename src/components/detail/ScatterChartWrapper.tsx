@@ -42,18 +42,16 @@ export function ScatterChartWrapper({ points }: ScatterChartWrapperProps) {
     };
 
     return (
-        <div ref={ref} style={{ width: "100%", height: "100%" }}>
-            {ref !== null && (
-                <LineChart
-                    data={data}
-                    hideLegend
-                    width={width ?? 160}
-                    height={height ?? 160}
-                    enableReflow={true}
-                    yMaxValue={yMax}
-                    yMinValue={yMin}
-                />
-            )}
+        <div ref={ref} style={{ height: "100%" }}>
+            <LineChart
+                data={data}
+                hideLegend
+                width={width ?? 160}
+                height={height ?? 160}
+                enableReflow={true}
+                yMaxValue={yMax}
+                yMinValue={yMin}
+            />
         </div>
     );
 }

@@ -1,5 +1,7 @@
 import { DonutChart, IChartProps } from "@fluentui/react-charting";
 import { getClusterColor } from "./clusterColerUtils";
+import { useMeasure } from "@uidotdev/usehooks";
+import { useEffect } from "react";
 
 interface DonutChartWrapperProps {
     counts: {
@@ -11,6 +13,8 @@ interface DonutChartWrapperProps {
 }
 
 export function DonutChartWrapper({ counts }: DonutChartWrapperProps) {
+    const [ref, { width, height }] = useMeasure();
+
     const data: IChartProps = {
         chartTitle: "OVerview per cluster",
         chartData: [
@@ -22,18 +26,20 @@ export function DonutChartWrapper({ counts }: DonutChartWrapperProps) {
     };
 
     return (
-        <DonutChart
-            data={data}
-            innerRadius={35}
-            legendProps={{
-                allowFocusOnLegends: true,
-            }}
-            hideLegend
-            hideLabels={false}
-            showLabelsInPercent={false}
-            valueInsideDonut={counts[1] + counts[2] + counts[3] + counts[4]}
-            // height={240}
-            // width={200}
-        />
+        <div ref={ref} style={{ height: "100%" }}>
+            <DonutChart
+                data={data}
+                innerRadius={35}
+                legendProps={{
+                    allowFocusOnLegends: true,
+                }}
+                hideLegend
+                hideLabels={false}
+                showLabelsInPercent={false}
+                valueInsideDonut={counts[1] + counts[2] + counts[3] + counts[4]}
+                width={width ?? 200}
+                height={height ?? 200}
+            />
+        </div>
     );
 }
