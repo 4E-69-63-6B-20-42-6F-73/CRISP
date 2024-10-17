@@ -32,8 +32,8 @@ export function DonutChartWrapper({ counts }: DonutChartWrapperProps) {
             hideLabels={false}
             showLabelsInPercent={false}
             valueInsideDonut={counts[1] + counts[2] + counts[3] + counts[4]}
-            height={240}
-            width={200}
+            // height={240}
+            // width={200}
         />
     );
 }

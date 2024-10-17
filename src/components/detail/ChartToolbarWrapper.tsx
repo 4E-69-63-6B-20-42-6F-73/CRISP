@@ -20,9 +20,13 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
+    // Listen to only exiting fullscreen.
     useEffect(() => {
         const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
+            const isNowFullscreen = !!document.fullscreenElement;
+            if (!isNowFullscreen) {
+                setIsFullscreen(false);
+            }
         };
 
         document.addEventListener("fullscreenchange", handleFullscreenChange);
@@ -35,12 +39,46 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
         };
     }, []);
 
+    useEffect(() => {
+        // This is a workaround to make the pop-over appear in fullscreen mode.
+        // Fluentui defines a layer outside the <App> so it isn't in the normal document flow
+        // So if we take a subset of the page and make that fullscreen, it won't show.
+        // So this adds that layer to the component that we toggle.
+        // And after closing fullscreen we move it back to the orginal parent.
+
+        const tooltipElement = document.getElementById(
+            "fluent-default-layer-host",
+        );
+        const chartContainer = wrapperRef.current;
+        let originalParent: HTMLElement | null = null;
+
+        if (tooltipElement) {
+            // Save the original parent the first time we manipulate the tooltip element
+            if (!originalParent) {
+                originalParent = tooltipElement.parentElement;
+            }
+
+            if (isFullscreen && chartContainer) {
+                chartContainer.append(tooltipElement);
+            } else if (!isFullscreen) {
+                if (chartContainer && chartContainer.contains(tooltipElement)) {
+                    chartContainer.removeChild(tooltipElement);
+                }
+                if (originalParent) {
+                    originalParent.append(tooltipElement);
+                }
+            }
+        }
+    }, [isFullscreen]);
+
     const handleFullscreen = () => {
         if (wrapperRef.current) {
-            if (!document.fullscreenElement) {
+            if (!isFullscreen) {
                 wrapperRef.current.requestFullscreen();
+                setIsFullscreen(true);
             } else {
                 document.exitFullscreen();
+                setIsFullscreen(false);
             }
         }
     };
