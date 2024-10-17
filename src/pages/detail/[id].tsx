@@ -16,6 +16,7 @@ import { DetailUmap } from "@/components/detail/DetailUmap";
 
 import { ArrowDownload24Regular } from "@fluentui/react-icons";
 import { exportJsonToExcel } from "@/utils/exportToExcel";
+import { ChartToolbarWrapper } from "@/components/detail/ChartToolbarWrapper";
 
 const useClasses = makeStyles({
     div: {
@@ -113,14 +114,18 @@ export default function Details() {
                 </div>
 
                 <div className={classes.div}>
-                    <DonutChartWrapper counts={counts.counts} />
+                    <ChartToolbarWrapper title="Distribution">
+                        <DonutChartWrapper counts={counts.counts} />
+                    </ChartToolbarWrapper>
                 </div>
                 <div className={classes.div}>
-                    <DetailUmap
-                        data={data}
-                        clusters={clustering}
-                        patientIds={patients}
-                    />
+                    <ChartToolbarWrapper title="UMAP">
+                        <DetailUmap
+                            data={data}
+                            clusters={clustering}
+                            patientIds={patients}
+                        />
+                    </ChartToolbarWrapper>
                 </div>
             </div>
 
