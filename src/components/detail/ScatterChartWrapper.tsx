@@ -47,7 +47,7 @@ export function ScatterChartWrapper({ points }: ScatterChartWrapperProps) {
                 <LineChart
                     data={data}
                     hideLegend
-                    width={160}
+                    width={width ?? 160}
                     height={height ?? 160}
                     enableReflow={true}
                     yMaxValue={yMax}
