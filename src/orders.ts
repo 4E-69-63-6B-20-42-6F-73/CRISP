@@ -9,8 +9,6 @@ const expectedColumnInFile: string[] = [
     "RF",
     "aCCP",
     "Sex",
-    "Age_Early",
-    "Age_Late",
     "Pijn_acromioclaviaculair R",
     "Pijn_acromioclaviaculair L",
     "Zwelling_acromioclaviaculair R",

@@ -135,5 +135,12 @@ function pre_process(data: any) {
         }
     }
 
+    copy["Age_Early"] = copy["Age"] < 65 ? 1 : 0;
+    copy["Age_Late"] = copy["Age"] >= 65 ? 1 : 0;
+
+    copy["Sex"] = copy["Sex"][0] == "M" ? 0 : 1;
+
+    console.log(copy);
+
     return reorderObjectValuesByKeyList(copy, expectedOrderForModel);
 }

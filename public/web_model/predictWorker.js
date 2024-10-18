@@ -11,7 +11,7 @@ the python code should be in web_model/python.zip
 importScripts(
     "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js",
 );
-importScripts("https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.js");
+importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js");
 
 let pyodide = null;
 let model = null;
