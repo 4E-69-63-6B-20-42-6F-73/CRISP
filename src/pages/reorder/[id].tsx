@@ -8,7 +8,7 @@ import {
 
 import { useNavigate, useParams } from "@/router";
 import { ToggableTag } from "@/components/reorder/ToggableTag";
-import { ClickableMannequin } from "@/components/ClickableMannequin/ClickableMannequin";
+import { ClickableMannequin } from "@/components/Mannequin/ClickableMannequin";
 import { expectedColumnInFile } from "@/orders";
 import setsAreEqual from "@/utils/setsAreEqual";
 
