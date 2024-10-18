@@ -2,6 +2,7 @@ import { UMAP } from "umap-js";
 import { ScatterChartWrapper } from "./ScatterChartWrapper";
 import { useEffect, useState } from "react";
 import { Spinner } from "@fluentui/react-components";
+import MinMaxScaler from "@/utils/minMaxScaler";
 
 interface DetailUmapProps {
     data: any[];
@@ -14,9 +15,9 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
 
     useEffect(() => {
         async function doUmap() {
-            const withoutPatient = encodeStrings(
-                data.map((innerList) => innerList.slice(1)),
-            ); // Remove patient number and encode strings as numbers
+            const withoutPatient = scaleData(
+                encodeStrings(data.map((innerList) => innerList.slice(1))),
+            ); // Remove patient number and encode strings as numbers and scale data
             const umap = new UMAP({
                 nComponents: 2,
                 nNeighbors: data.length < 50 ? data.length - 1 : 50,
@@ -149,4 +150,18 @@ function encodeStrings(matrix: any[][]): any[][] {
     }
 
     return matrix;
+}
+function scaleData(data: any[][]): any[][] {
+    const featuresCount = data[0].length;
+
+    for (let index = 0; index < featuresCount; index++) {
+        const scalar = new MinMaxScaler();
+        const column = data.map((x) => x[index]);
+        const scaled = scalar.fitTransform(column);
+
+        for (let i = 0; i < data.length; i++) {
+            data[i][index] = scaled[i];
+        }
+    }
+    return data;
 }
