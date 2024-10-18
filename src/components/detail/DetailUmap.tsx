@@ -14,7 +14,9 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
 
     useEffect(() => {
         async function doUmap() {
-            const withoutPatient = data.map((innerList) => innerList.slice(1)); // Remove patient number
+            const withoutPatient = encodeStrings(
+                data.map((innerList) => innerList.slice(1)),
+            ); // Remove patient number and encode strings as numbers
             const umap = new UMAP({
                 nComponents: 2,
                 nNeighbors: data.length < 50 ? data.length - 1 : 50,
@@ -129,4 +131,22 @@ function detectOutliers(points: Point[]): Point[] {
     });
 
     return points;
+}
+
+function encodeStrings(matrix: any[][]): any[][] {
+    const stringMap = new Map<string, number>();
+    let stringCounter = 1;
+
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+            if (typeof matrix[i][j] === "string") {
+                if (!stringMap.has(matrix[i][j])) {
+                    stringMap.set(matrix[i][j], stringCounter++);
+                }
+                matrix[i][j] = stringMap.get(matrix[i][j]);
+            }
+        }
+    }
+
+    return matrix;
 }
