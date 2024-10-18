@@ -1,5 +1,7 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { Joints } from "./Joints";
+
+import { Mannequin } from "./Mannequin";
 
 interface Circle {
     id: string;
@@ -28,6 +30,9 @@ export const ClickableMannequin: React.FC<ClickableMannequinProps> = ({
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const radius = 12;
 
+    const backgroundImage = new Image();
+    backgroundImage.src = Mannequin;
+
     const circles: Circle[] = useMemo(() => {
         return Joints.map((x) => ({
             id: id_prefix + "_" + x.id,
@@ -46,38 +51,7 @@ export const ClickableMannequin: React.FC<ClickableMannequinProps> = ({
         );
     };
 
-    const [backgroundImage, setBackgroundImage] =
-        useState<HTMLImageElement | null>(null);
-
-    useEffect(() => {
-        const loadBackground = async () => {
-            try {
-                const img = await loadImage(
-                    "/CRISP/Mannequin_large_old_quarter.jpg",
-                );
-                setBackgroundImage(img);
-            } catch (error) {
-                console.error("Error loading background image:", error);
-            }
-        };
-        loadBackground();
-    }, []);
-
-    async function loadImage(url: string): Promise<HTMLImageElement> {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = url;
-        });
-    }
-
-    const drawCircles = (
-        ctx: CanvasRenderingContext2D,
-        img: HTMLImageElement | null,
-    ) => {
-        if (!img) return;
-
+    const drawCircles = (ctx: CanvasRenderingContext2D) => {
         const fluentProvider = document.querySelector(
             ".fui-FluentProvider",
         ) as HTMLElement | null;
@@ -92,7 +66,7 @@ export const ClickableMannequin: React.FC<ClickableMannequinProps> = ({
 
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(backgroundImage, 0, 0);
 
         circles.forEach((circle) => {
             ctx.beginPath();
@@ -123,8 +97,12 @@ export const ClickableMannequin: React.FC<ClickableMannequinProps> = ({
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        drawCircles(ctx, backgroundImage);
-    }, [circles, backgroundImage]);
+        backgroundImage.onload = () => {
+            drawCircles(ctx);
+        };
+
+        drawCircles(ctx);
+    }, [circles]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
