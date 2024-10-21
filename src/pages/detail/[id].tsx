@@ -18,6 +18,8 @@ import { ArrowDownload24Regular } from "@fluentui/react-icons";
 import { exportJsonToExcel } from "@/utils/exportToExcel";
 import { ChartToolbarWrapper } from "@/components/detail/ChartToolbarWrapper";
 
+import Group from "@/components/Group";
+
 const useClasses = makeStyles({
     div: {
         background: tokens.colorNeutralBackground1,
@@ -60,6 +62,7 @@ export default function Details() {
     const patients = predictions.map((x) => x.patientId);
 
     const counts = count(clustering);
+
     return (
         <>
             <Breadcrumb>
@@ -78,15 +81,8 @@ export default function Details() {
             </Breadcrumb>
 
             <h1>Summary</h1>
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: "12px",
-                    alignItems: "center",
-                }}
-            >
-                <div className={classes.div}>
+            <Group childHeight="240px" childWidth="200px">
+                <div>
                     <h2 style={{ marginTop: "0px" }}>
                         <b>{counts.sum}</b> Patients
                     </h2>
@@ -114,21 +110,18 @@ export default function Details() {
                     </ul>
                 </div>
 
-                <div className={classes.div}>
-                    <ChartToolbarWrapper title="Distribution">
-                        <DonutChartWrapper counts={counts.counts} />
-                    </ChartToolbarWrapper>
-                </div>
-                <div className={classes.div}>
-                    <ChartToolbarWrapper title="UMAP">
-                        <DetailUmap
-                            data={data}
-                            clusters={clustering}
-                            patientIds={patients}
-                        />
-                    </ChartToolbarWrapper>
-                </div>
-            </div>
+                <ChartToolbarWrapper title="Distribution">
+                    <DonutChartWrapper counts={counts.counts} />
+                </ChartToolbarWrapper>
+
+                <ChartToolbarWrapper title="UMAP">
+                    <DetailUmap
+                        data={data}
+                        clusters={clustering}
+                        patientIds={patients}
+                    />
+                </ChartToolbarWrapper>
+            </Group>
 
             <div
                 style={{
