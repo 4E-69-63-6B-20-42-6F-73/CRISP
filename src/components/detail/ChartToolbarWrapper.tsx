@@ -85,7 +85,9 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
 
     const downloadChart = () => {
         if (wrapperRef.current) {
-            toPng(wrapperRef.current).then((dataUrl) => {
+            toPng(wrapperRef.current, {
+                filter: (node) => node.tagName !== "BUTTON",
+            }).then((dataUrl) => {
                 const link = document.createElement("a");
                 link.href = dataUrl;
                 link.download = `${title}.png`;
