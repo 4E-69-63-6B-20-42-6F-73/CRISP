@@ -1,5 +1,3 @@
-// TODO Cluster color 1 looks a lot like Brand color... Which should be changed?
-
 export function getClusterColor(cluster: number | null | undefined) {
     if (
         cluster === null ||
