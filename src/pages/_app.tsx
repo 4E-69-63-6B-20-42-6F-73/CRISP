@@ -1,4 +1,4 @@
-import { FluentProvider, webLightTheme } from "@fluentui/react-components";
+import { FluentProvider, teamsLightTheme } from "@fluentui/react-components";
 import { Outlet } from "react-router-dom";
 import AppBar from "../components/Appbar";
 
@@ -13,7 +13,7 @@ const useClasses = makeStyles({
 export default function App() {
     const classes = useClasses();
     return (
-        <FluentProvider theme={webLightTheme}>
+        <FluentProvider theme={teamsLightTheme}>
             <AppBar />
             <div className={classes.div}>
                 <Outlet />
