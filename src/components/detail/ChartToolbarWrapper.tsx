@@ -131,7 +131,6 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
                 style={{
                     flexGrow: "1",
                     height: "100%",
-                    maxHeight: isFullscreen ? "unset" : "200px",
                     flexShrink: "1",
                 }}
             >
