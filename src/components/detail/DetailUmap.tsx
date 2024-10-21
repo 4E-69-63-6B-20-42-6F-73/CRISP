@@ -11,26 +11,6 @@ interface DetailUmapProps {
 }
 
 export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
-    //TODO something is weird. Initial render is correct, but after exiting fullscreen the UMAP has an heigt of 240px
-    // So lets set the max-heigt to 200 if we are not in fullscreen
-    const [isFullscreen, setIsFullscreen] = useState(
-        !!document.fullscreenElement,
-    );
-
-    useEffect(() => {
-        const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
-        };
-
-        document.addEventListener("fullscreenchange", handleFullscreenChange);
-        return () => {
-            document.removeEventListener(
-                "fullscreenchange",
-                handleFullscreenChange,
-            );
-        };
-    }, []);
-
     const [points, setPoints] = useState<Point[]>([]);
 
     useEffect(() => {
@@ -58,7 +38,6 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
                 <div
                     style={{
                         height: "inherit",
-                        maxHeight: isFullscreen ? "unset" : "200px",
                     }}
                 >
                     <ScatterChartWrapper points={points} />

@@ -104,6 +104,7 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
                 padding: isFullscreen ? "12px" : "",
                 display: "flex",
                 flexDirection: "column",
+                minHeight: "0px",
             }}
         >
             <Toolbar
@@ -131,6 +132,7 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
                 style={{
                     flexGrow: "1",
                     height: "100%",
+                    minHeight: "0px", // When using flex, we should also set min-height.
                     flexShrink: "1",
                 }}
             >
