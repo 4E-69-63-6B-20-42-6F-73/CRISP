@@ -19,6 +19,7 @@ import { exportJsonToExcel } from "@/utils/exportToExcel";
 import { ChartToolbarWrapper } from "@/components/detail/ChartToolbarWrapper";
 
 import Group from "@/components/Group";
+import { SwellingPainOverView } from "@/components/detail/SwellingPainOverView";
 
 const useClasses = makeStyles({
     div: {
@@ -122,6 +123,11 @@ export default function Details() {
                     />
                 </ChartToolbarWrapper>
             </Group>
+
+            <div>
+                <h1>Swelling & Pain Overview</h1>
+                <SwellingPainOverView data={data} clusters={clustering} />
+            </div>
 
             <div
                 style={{
