@@ -111,6 +111,9 @@ function seperateZwellingAndPijn(
 }
 
 function MeanOfRecord(data: Record<string, number>[]) {
+    if (data.length === 0) {
+        return {};
+    }
     const keys = Object.keys(data[0]);
     const means: Record<string, number> = {};
 
