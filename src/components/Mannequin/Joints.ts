@@ -57,8 +57,8 @@ export const Joints: Coordinate[] = [
     { id: "tarsometatarsaal R", x: 576, y: 1466, z: 40 },
     { id: "temporomandibulair L", x: 772, y: 194, z: 80 },
     { id: "temporomandibulair R", x: 652, y: 210, z: 80 },
-    { id: "heup L", x: 629, y: 791, z: 0 },
-    { id: "heup R", x: 799, y: 783, z: 0 },
+    { id: "heup links", x: 629, y: 791, z: 0 },
+    { id: "heup rechts", x: 799, y: 783, z: 0 },
 ];
 
 interface Coordinate {

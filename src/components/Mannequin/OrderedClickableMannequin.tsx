@@ -1,5 +1,6 @@
-import React, { useRef, useEffect, useMemo, useState } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { Joints } from "./Joints";
+
 import { Mannequin } from "./Mannequin";
 
 interface Circle {
@@ -15,19 +16,15 @@ interface Point {
     y: number;
 }
 
-interface SelectionState {
-    id: string;
-    isSelected: boolean;
+interface OrderedClickableMannequinProps {
+    order: string[];
+    setOrder: React.Dispatch<React.SetStateAction<string[]>>;
+    id_prefix: string;
 }
 
-interface ClickableMannequinProps {
-    onSelectionChange: (selectionState: SelectionState[]) => void;
-}
-
-export const ClickableMannequin: React.FC<ClickableMannequinProps> = ({
-    onSelectionChange,
-}) => {
-    const [selected, setSelected] = useState<string[]>([]);
+export const OrderedClickableMannequin: React.FC<
+    OrderedClickableMannequinProps
+> = ({ order, setOrder, id_prefix }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const radius = 12;
 
@@ -36,26 +33,19 @@ export const ClickableMannequin: React.FC<ClickableMannequinProps> = ({
 
     const circles: Circle[] = useMemo(() => {
         return Joints.map((x) => ({
-            id: x.id,
+            id: id_prefix + "_" + x.id,
             x: x.x / 4,
             y: x.y / 4,
-            isSelected: selected.includes(x.id),
+            isSelected: order.includes(id_prefix + "_" + x.id),
+            number: order.findIndex((y) => y === id_prefix + "_" + x.id) + 1,
         }));
-    }, [selected]);
-
-    useEffect(() => {
-        const selectionState = circles.map((circle) => ({
-            id: circle.id,
-            isSelected: !!circle.isSelected,
-        }));
-        onSelectionChange(selectionState);
-    }, [circles]);
+    }, [order]);
 
     const toggle = (id: string): void => {
-        setSelected((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((y) => y !== id)
-                : [...prevSelected, id],
+        setOrder((prevOrder) =>
+            prevOrder.includes(id)
+                ? prevOrder.filter((y) => y !== id)
+                : [...prevOrder, id],
         );
     };
 
@@ -87,11 +77,7 @@ export const ClickableMannequin: React.FC<ClickableMannequinProps> = ({
                 ctx.font = font;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
-                ctx.fillText(
-                    circle.number?.toString() ?? "",
-                    circle.x,
-                    circle.y,
-                );
+                ctx.fillText(circle.number.toString(), circle.x, circle.y);
             }
         });
     };
