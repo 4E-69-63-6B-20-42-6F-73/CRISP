@@ -4,23 +4,40 @@ import { useEffect, useState } from "react";
 import { Spinner } from "@fluentui/react-components";
 import MinMaxScaler from "@/utils/minMaxScaler";
 
+type UMAPsettings = {
+    nNeighbors: number;
+};
+
 interface DetailUmapProps {
     data: any[];
     clusters: number[];
     patientIds: string[];
+
+    settings?: UMAPsettings;
 }
 
-export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
+export function DetailUmap({
+    data,
+    clusters,
+    patientIds,
+    settings,
+}: DetailUmapProps) {
     const [points, setPoints] = useState<Point[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         async function doUmap() {
+            if (data.length < 2) return;
+
+            setIsLoading(true);
             const withoutPatient = scaleData(
                 encodeStrings(data.map((innerList) => innerList.slice(1))),
-            ); // Remove patient number and encode strings as numbers and scale data
+            ); // Remove patient number, encode strings, scale data
+
             const umap = new UMAP({
                 nComponents: 2,
-                nNeighbors: data.length < 50 ? data.length - 1 : 50,
+                nNeighbors: settings?.nNeighbors ?? 2,
+                minDist: 0.00001,
             });
             const embedding = await umap.fitAsync(withoutPatient);
             setPoints(
@@ -28,21 +45,26 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
                     mapEmbeddingToPoints(embedding, clusters, patientIds),
                 ),
             );
+            setIsLoading(false);
         }
+
         doUmap();
-    }, []);
+    }, [data, clusters, patientIds, settings]);
 
     return (
         <>
-            {points.length !== 0 ? (
+            {data.length < 2 ? (
                 <div
                     style={{
                         height: "inherit",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                     }}
                 >
-                    <ScatterChartWrapper points={points} />
+                    <p>Not enough data.</p>
                 </div>
-            ) : (
+            ) : isLoading ? (
                 <div
                     style={{
                         height: "inherit",
@@ -51,6 +73,14 @@ export function DetailUmap({ data, clusters, patientIds }: DetailUmapProps) {
                     }}
                 >
                     <Spinner size="extra-large" />
+                </div>
+            ) : (
+                <div
+                    style={{
+                        height: "inherit",
+                    }}
+                >
+                    <ScatterChartWrapper points={points} />
                 </div>
             )}
         </>
@@ -155,6 +185,7 @@ function encodeStrings(matrix: any[][]): any[][] {
 
     return matrix;
 }
+
 function scaleData(data: any[][]): any[][] {
     const featuresCount = data[0].length;
 

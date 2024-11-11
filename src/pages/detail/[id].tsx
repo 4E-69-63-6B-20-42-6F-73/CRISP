@@ -20,6 +20,8 @@ import { ChartToolbarWrapper } from "@/components/detail/ChartToolbarWrapper";
 
 import Group from "@/components/Group";
 import { SwellingPainOverView } from "@/components/detail/SwellingPainOverView";
+import { DetailUmapSettings } from "@/components/detail/detailUmapSettings";
+import { useState } from "react";
 
 const useClasses = makeStyles({
     div: {
@@ -64,6 +66,9 @@ export default function Details() {
 
     const counts = count(clustering);
 
+    const [umapSettings, setUmapSettings] = useState({
+        nNeighbors: data.length > 50 ? 30 : data.length / 2,
+    });
     return (
         <>
             <Breadcrumb>
@@ -115,11 +120,23 @@ export default function Details() {
                     <DonutChartWrapper counts={counts.counts} />
                 </ChartToolbarWrapper>
 
-                <ChartToolbarWrapper title="UMAP">
+                <ChartToolbarWrapper
+                    title="UMAP"
+                    settings={
+                        <DetailUmapSettings
+                            initialSettings={umapSettings}
+                            maxNeighbors={data.length - 1}
+                            onSettingChange={(newSettings) => {
+                                setUmapSettings(newSettings);
+                            }}
+                        />
+                    }
+                >
                     <DetailUmap
                         data={data}
                         clusters={clustering}
                         patientIds={patients}
+                        settings={umapSettings}
                     />
                 </ChartToolbarWrapper>
             </Group>

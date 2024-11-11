@@ -1,23 +1,33 @@
-import { useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import {
     Toolbar,
     ToolbarButton,
     Caption1Strong,
     tokens,
+    Popover,
+    PopoverSurface,
+    PopoverTrigger,
 } from "@fluentui/react-components";
 import {
     FullScreenMaximize24Regular,
     ArrowDownload24Regular,
+    Settings24Regular,
 } from "@fluentui/react-icons";
 import { toPng } from "html-to-image";
 
 interface ChartWrapperProps {
     title: string;
     children: React.ReactNode;
+    settings?: ReactElement;
 }
 
-export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
+export function ChartToolbarWrapper({
+    title,
+    children,
+    settings,
+}: ChartWrapperProps) {
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
     // Listen to only exiting fullscreen.
@@ -118,6 +128,28 @@ export function ChartToolbarWrapper({ title, children }: ChartWrapperProps) {
                 }}
             >
                 <Caption1Strong style={{ flexGrow: 1 }}>{title}</Caption1Strong>
+                {settings !== undefined ? (
+                    <Popover
+                        onOpenChange={(_, data) => setIsSettingsOpen(data.open)}
+                        inline
+                    >
+                        <PopoverTrigger disableButtonEnhancement>
+                            <ToolbarButton
+                                aria-label="OpenSettings"
+                                icon={<Settings24Regular />}
+                                appearance={
+                                    isSettingsOpen ? "primary" : "subtle"
+                                }
+                            />
+                        </PopoverTrigger>
+
+                        <PopoverSurface tabIndex={-1}>
+                            <>{settings}</>
+                        </PopoverSurface>
+                    </Popover>
+                ) : (
+                    <></>
+                )}
                 <ToolbarButton
                     aria-label="Toggle fullscreen"
                     icon={<FullScreenMaximize24Regular />}
