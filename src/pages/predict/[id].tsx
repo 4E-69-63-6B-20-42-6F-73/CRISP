@@ -7,12 +7,9 @@ import {
 } from "@/stores/ApplicationStore";
 
 import { useNavigate, useParams } from "@/router";
-import { expectedColumnInFile, expectedOrderForModel } from "@/orders";
+import { expectedColumnInFile } from "@/orders";
 import setsAreEqual from "@/utils/setsAreEqual";
-
-const reorderObjectValuesByKeyList = (obj: any, keyOrder: string[]): any[] => {
-    return keyOrder.filter((key) => key in obj).map((key) => obj[key]);
-};
+import { predict } from "@/utils/predict";
 
 export default function Predict() {
     const params = useParams("/predict/:id");
@@ -24,9 +21,7 @@ export default function Predict() {
     const [text, setText] = useState(getText("", 0, 0));
     const analyse = useGetAnalysesById(id);
 
-    const data = analyse.files
-        .flatMap((x) => x.content as any[])
-        .map((contentItem: any) => pre_process(contentItem));
+    const data = analyse.files.flatMap((x) => x.content as any[]);
 
     useEffect(() => {
         if (analyse.prediction !== undefined) {
@@ -41,32 +36,27 @@ export default function Predict() {
             navigate("/reorder/:id", { params: { id: id.toString() } });
         }
 
-        const worker = new Worker("/CRISP/web_model/predictWorker.js");
-        worker.postMessage({ data });
-
-        worker.onmessage = (event) => {
-            const {
-                type,
-                index,
-                total,
-                predictions: workerPredictions,
-            } = event.data;
-
-            if (type === "loading") {
-                setText(getText("loading", index, total));
-            }
-            if (type === "progress") {
-                setText(getText("predicting", index, total));
-            } else if (type === "done") {
-                addPrediction(id, workerPredictions);
-                worker.terminate();
+        const cleanup = predict({
+            data,
+            onProgress: (type, index, total) => {
+                setText(
+                    getText(
+                        type === "loading" ? "loading" : "predicting",
+                        index,
+                        total,
+                    ),
+                );
+            },
+            onComplete: (predictions) => {
+                addPrediction(id, predictions);
                 navigate("/detail/:id", { params: { id: id.toString() } });
-            }
-        };
+            },
+            onError: (error) => {
+                console.error("Prediction error:", error);
+            },
+        });
 
-        return () => {
-            worker.terminate();
-        };
+        return cleanup;
     }, []);
 
     return (
@@ -119,28 +109,3 @@ const getText = (
             return { line1: "", line2: "", line3: "" };
     }
 };
-
-// Preprocess by duplicating keys with pijn or zwelling into _positieve and _negatieve and reorder as expected by the model.
-function pre_process(data: any) {
-    const copy = { ...data };
-
-    for (const key of Object.keys(data)) {
-        const value = copy[key];
-
-        if (key.includes("Pijn") || key.includes("Zwelling")) {
-            copy[`${key}_positive`] = value;
-            copy[`${key}_negative`] = value == 1 ? 0 : 1;
-
-            delete copy[key];
-        }
-    }
-
-    copy["Age_Early"] = copy["Age"] < 65 ? 1 : 0;
-    copy["Age_Late"] = copy["Age"] >= 65 ? 1 : 0;
-
-    copy["Sex"] = copy["Sex"][0] == "M" ? 0 : 1;
-
-    console.log(copy);
-
-    return reorderObjectValuesByKeyList(copy, expectedOrderForModel);
-}
