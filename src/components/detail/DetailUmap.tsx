@@ -3,10 +3,12 @@ import { ScatterChartWrapper } from "./ScatterChartWrapper";
 import { useEffect, useState } from "react";
 import { Spinner } from "@fluentui/react-components";
 import MinMaxScaler from "@/utils/minMaxScaler";
+import { cosine, euclidean } from "umap-js/dist/umap";
 
 type UMAPsettings = {
     nNeighbors: number;
     minDist: number;
+    distanceFunction: "euclidean" | "cosine";
 };
 
 interface DetailUmapProps {
@@ -38,6 +40,10 @@ export function DetailUmap({
                 nComponents: 2,
                 nNeighbors: settings?.nNeighbors ?? 2,
                 minDist: settings?.minDist,
+                distanceFn:
+                    settings?.distanceFunction == "euclidean"
+                        ? euclidean
+                        : cosine,
             });
             const embedding = await umap.fitAsync(withoutPatient);
             setPoints(

@@ -1,10 +1,13 @@
 import { useDebounce } from "@/utils/debounce";
 import { MinMax } from "../MinMaxSlider";
 import { useState, useEffect } from "react";
+import { Combobox } from "@/components/Combobox";
+import { Option } from "@fluentui/react-components";
 
 interface DetailUmapSettings {
     nNeighbors: number;
     minDist: number;
+    distanceFunction: "euclidean" | "cosine";
 }
 
 interface DetailUmapSettingsProps {
@@ -20,23 +23,30 @@ export function DetailUmapSettings({
 }: DetailUmapSettingsProps) {
     const [nNeighbors, setNNeighbors] = useState(initialSettings.nNeighbors);
     const [minDist, setMinDist] = useState(initialSettings.minDist);
+    const [distanceFunction, setDistanceFunction] = useState(
+        initialSettings.distanceFunction || "euclidean",
+    );
 
     const debouncedNNeighbors = useDebounce(nNeighbors, 200);
     const debouncedMinDist = useDebounce(minDist, 200);
+    const debouncedDistanceFunction = useDebounce(distanceFunction, 200);
 
     useEffect(() => {
         if (
             debouncedNNeighbors !== initialSettings.nNeighbors ||
-            debouncedMinDist !== initialSettings.minDist
+            debouncedMinDist !== initialSettings.minDist ||
+            debouncedDistanceFunction !== initialSettings.distanceFunction
         ) {
             onSettingChange({
                 nNeighbors: debouncedNNeighbors,
                 minDist: debouncedMinDist,
+                distanceFunction: debouncedDistanceFunction,
             });
         }
     }, [
         debouncedNNeighbors,
         debouncedMinDist,
+        debouncedDistanceFunction,
         initialSettings,
         onSettingChange,
     ]);
@@ -66,6 +76,22 @@ export function DetailUmapSettings({
                     }
                 }}
             />
+            <Combobox
+                label="Distance function"
+                defaultValue={initialSettings.distanceFunction || "euclidean"}
+                onOptionSelect={(_, data) => {
+                    let newDistanceFunction =
+                        data.optionValue === "euclidean"
+                            ? "euclidean"
+                            : ("cosine" as "euclidean" | "cosine");
+                    if (newDistanceFunction !== distanceFunction) {
+                        setDistanceFunction(newDistanceFunction);
+                    }
+                }}
+            >
+                <Option key="euclidean">euclidean</Option>
+                <Option key="cosine">cosine</Option>
+            </Combobox>
         </>
     );
 }

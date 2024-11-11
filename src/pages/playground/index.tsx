@@ -17,6 +17,7 @@ export default function Index() {
     const [umapSettings, setUmapSettings] = useState({
         nNeighbors: 1,
         minDist: 0.1,
+        distanceFunction: "euclidean" as "euclidean" | "cosine",
     });
 
     const [datas, setDatas] = useState<any[]>([]);

@@ -69,6 +69,7 @@ export default function Details() {
     const [umapSettings, setUmapSettings] = useState({
         nNeighbors: data.length > 50 ? 30 : data.length / 2,
         minDist: 0.1,
+        distanceFunction: "euclidean" as "euclidean" | "cosine",
     });
     return (
         <>
