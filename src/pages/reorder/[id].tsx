@@ -8,7 +8,7 @@ import {
 
 import { useNavigate, useParams } from "@/router";
 import { ToggableTag } from "@/components/reorder/ToggableTag";
-import { ClickableMannequin } from "@/components/Mannequin/ClickableMannequin";
+import { OrderedClickableMannequin } from "@/components/Mannequin/OrderedClickableMannequin";
 import { expectedColumnInFile } from "@/orders";
 import setsAreEqual from "@/utils/setsAreEqual";
 
@@ -93,7 +93,7 @@ export default function Reorder() {
             <div style={{ display: "flex", flexDirection: "row", gap: "12px" }}>
                 <div>
                     <h2>Swelling</h2>
-                    <ClickableMannequin
+                    <OrderedClickableMannequin
                         order={order}
                         setOrder={setOrder}
                         id_prefix="Zwelling"
@@ -102,7 +102,7 @@ export default function Reorder() {
 
                 <div>
                     <h2>Pain</h2>
-                    <ClickableMannequin
+                    <OrderedClickableMannequin
                         order={order}
                         setOrder={setOrder}
                         id_prefix="Pijn"
