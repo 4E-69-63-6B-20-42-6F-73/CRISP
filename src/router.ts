@@ -7,6 +7,7 @@ export type Path =
     | `/`
     | `/detail/:id`
     | `/new`
+    | `/playground`
     | `/predict/:id`
     | `/reorder/:id`;
 
