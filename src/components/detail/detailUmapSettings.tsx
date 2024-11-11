@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 interface DetailUmapSettings {
     nNeighbors: number;
+    minDist: number;
 }
 
 interface DetailUmapSettingsProps {
@@ -18,13 +19,27 @@ export function DetailUmapSettings({
     onSettingChange,
 }: DetailUmapSettingsProps) {
     const [nNeighbors, setNNeighbors] = useState(initialSettings.nNeighbors);
+    const [minDist, setMinDist] = useState(initialSettings.minDist);
+
     const debouncedNNeighbors = useDebounce(nNeighbors, 200);
+    const debouncedMinDist = useDebounce(minDist, 200);
 
     useEffect(() => {
-        if (debouncedNNeighbors !== initialSettings.nNeighbors) {
-            onSettingChange({ nNeighbors: debouncedNNeighbors });
+        if (
+            debouncedNNeighbors !== initialSettings.nNeighbors ||
+            debouncedMinDist !== initialSettings.minDist
+        ) {
+            onSettingChange({
+                nNeighbors: debouncedNNeighbors,
+                minDist: debouncedMinDist,
+            });
         }
-    }, [debouncedNNeighbors, initialSettings.nNeighbors, onSettingChange]);
+    }, [
+        debouncedNNeighbors,
+        debouncedMinDist,
+        initialSettings,
+        onSettingChange,
+    ]);
 
     return (
         <>
@@ -34,9 +49,20 @@ export function DetailUmapSettings({
                 min={1}
                 max={maxNeighbors}
                 onChange={(value) => {
-                    // Update nNeighbors only if the new value is different
                     if (value !== nNeighbors) {
                         setNNeighbors(value);
+                    }
+                }}
+            />
+            <MinMax
+                label="minDist"
+                defaultValue={initialSettings.minDist}
+                min={0.01}
+                max={1}
+                step={0.01}
+                onChange={(value) => {
+                    if (value !== minDist) {
+                        setMinDist(value);
                     }
                 }}
             />

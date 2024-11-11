@@ -14,7 +14,10 @@ interface Joints {
 }
 
 export default function Index() {
-    const [umapSettings, setUmapSettings] = useState({ nNeighbors: 1 });
+    const [umapSettings, setUmapSettings] = useState({
+        nNeighbors: 1,
+        minDist: 0.1,
+    });
 
     const [datas, setDatas] = useState<any[]>([]);
     const [clusters, setClusters] = useState<any[]>([]);

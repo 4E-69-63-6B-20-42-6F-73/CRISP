@@ -6,6 +6,7 @@ import MinMaxScaler from "@/utils/minMaxScaler";
 
 type UMAPsettings = {
     nNeighbors: number;
+    minDist: number;
 };
 
 interface DetailUmapProps {
@@ -28,7 +29,6 @@ export function DetailUmap({
     useEffect(() => {
         async function doUmap() {
             if (data.length < 2) return;
-
             setIsLoading(true);
             const withoutPatient = scaleData(
                 encodeStrings(data.map((innerList) => innerList.slice(1))),
@@ -37,7 +37,7 @@ export function DetailUmap({
             const umap = new UMAP({
                 nComponents: 2,
                 nNeighbors: settings?.nNeighbors ?? 2,
-                minDist: 0.00001,
+                minDist: settings?.minDist,
             });
             const embedding = await umap.fitAsync(withoutPatient);
             setPoints(

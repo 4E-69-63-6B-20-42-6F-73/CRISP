@@ -18,6 +18,7 @@ const useStyles = makeStyles({
 interface MinMaxProps {
     min?: number;
     max?: number;
+    step?: number;
     defaultValue?: number;
     label?: string;
     onChange?: (value: number) => void;
@@ -26,6 +27,7 @@ interface MinMaxProps {
 export const MinMax: React.FC<MinMaxProps> = ({
     min = 0,
     max = 100,
+    step,
     defaultValue,
     label,
     onChange,
@@ -66,6 +68,7 @@ export const MinMax: React.FC<MinMaxProps> = ({
                         thumb={{ ref: setThumbRef }}
                         min={min}
                         max={max}
+                        step={step}
                         value={value}
                         id={id}
                         onChange={handleChange}
