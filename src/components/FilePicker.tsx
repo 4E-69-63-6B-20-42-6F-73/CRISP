@@ -102,6 +102,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                         <TagPickerInput
                             aria-label="Select Files"
                             onKeyDown={handleKeyDown}
+                            onClick={handleAddClick}
                         />
                     </TagPickerControl>
                 </TagPicker>
