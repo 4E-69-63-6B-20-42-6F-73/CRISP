@@ -12,9 +12,18 @@ import { OrderedClickableMannequin } from "@/components/Mannequin/OrderedClickab
 import { expectedColumnInFile } from "@/orders";
 import setsAreEqual from "@/utils/setsAreEqual";
 
-const numeric = ["PATNR", "Leuko", "Hb", "MCV", "Trom", "Age", "BSE"];
-
-// TODO: RF	aCCP	Sex	Age_Early	Age_Late
+const numeric = [
+    "PATNR",
+    "Leuko",
+    "Hb",
+    "MCV",
+    "Trom",
+    "Age",
+    "BSE",
+    "RF",
+    "aCCP",
+    "Sex",
+];
 
 export default function Reorder() {
     const params = useParams("/predict/:id");
@@ -177,23 +186,16 @@ export default function Reorder() {
     );
 }
 
-// We want to find the first X matching item between old and expected.
+// We want to find the order of matching item between old and expected.
 function getInitialOrder(
     oldColumns: string[],
     expectedColumnInFile: string[],
 ): string[] {
-    const initialOrder: string[] = [];
+    const indexs = oldColumns.map((x) =>
+        expectedColumnInFile.findIndex((y) => x === y),
+    );
+    const initialOrder = indexs.map((x) => (x !== -1 ? oldColumns[x] : ""));
 
-    for (let index = 0; index < oldColumns.length; index++) {
-        const oldColumn = oldColumns[index];
-        const expected = expectedColumnInFile[index];
-
-        if (oldColumn === expected) {
-            initialOrder.push(oldColumn);
-        } else {
-            initialOrder.push("");
-        }
-    }
     return initialOrder;
 }
 

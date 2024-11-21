@@ -1,15 +1,5 @@
 import { expectedOrderForModel } from "@/orders";
 
-var globalWorker: Worker;
-
-function getWorker() {
-    if (!globalWorker) {
-        globalWorker = new Worker("/CRISP/web_model/predictWorker.js");
-    }
-
-    return globalWorker;
-}
-
 export function predict({
     data,
     onProgress,
@@ -22,7 +12,7 @@ export function predict({
     onError: (error: any) => void;
 }) {
     try {
-        const worker = getWorker();
+        const worker = new Worker("/CRISP/web_model/predictWorker.js");
 
         const pre_processed = data.map((x) => pre_process(x));
         worker.postMessage({ data: pre_processed });
@@ -34,7 +24,7 @@ export function predict({
                 onProgress(type, index, total);
             } else if (type === "done") {
                 onComplete(predictions);
-                // worker.terminate();
+                worker.terminate();
             }
         };
 
@@ -44,7 +34,7 @@ export function predict({
         };
 
         return () => {
-            // worker.terminate();
+            worker.terminate();
         };
     } catch (error) {
         onError(error);
@@ -71,13 +61,7 @@ function pre_process(data: any) {
 
     copy["Sex"] = copy["Sex"][0] == "M" ? 0 : 1;
 
-    console.log(copy);
-
-    const a = reorderObjectValuesByKeyList(copy, expectedOrderForModel);
-
-    console.log(a);
-
-    return a;
+    return reorderObjectValuesByKeyList(copy, expectedOrderForModel);
 }
 
 const reorderObjectValuesByKeyList = (obj: any, keyOrder: string[]): any[] => {
