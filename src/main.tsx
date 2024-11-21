@@ -1,12 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { routes } from "@generouted/react-router";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 
 import "./main.css";
 import { useHasLoaded } from "./stores/ApplicationStore";
 
-const router = createBrowserRouter(routes, { basename: "/CRISP/" });
+const router = createHashRouter(routes);
 
 const LoadingCheck = () => {
     const hasLoaded = useHasLoaded();
