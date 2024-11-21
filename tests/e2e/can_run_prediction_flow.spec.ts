@@ -17,7 +17,7 @@ test("with spreadsheet and correct prediction", async ({ page }) => {
     await page.getByLabel("Description").fill("This is a test");
     await page.getByLabel("Select Files").click();
     await page.getByRole("button", { name: "Create", exact: true }).click();
-    await page.waitForURL("detail/*");
+    await page.waitForURL("#/detail/*");
     await expect(page.locator("#root")).toContainText(
         "100 Patients14 Cluster 1 11 Cluster 2 24 Cluster 3 51 Cluster 4",
     );
@@ -38,8 +38,7 @@ test("with csv and correct prediction", async ({ page }) => {
     await page.getByLabel("Description").fill("This is a test");
     await page.getByLabel("Select Files").click();
     await page.getByRole("button", { name: "Create", exact: true }).click();
-    await page.waitForURL("detail/*");
-
+    await page.waitForURL("#/detail/*");
     await expect(page.locator("#root")).toContainText(
         "100 Patients12 Cluster 1 14 Cluster 2 19 Cluster 3 55 Cluster 4  ",
     );
@@ -63,7 +62,7 @@ test("with mixed input and correct prediction", async ({ page }) => {
     await page.getByLabel("Description").fill("This is a test");
     await page.getByLabel("Select Files").click();
     await page.getByRole("button", { name: "Create", exact: true }).click();
-    await page.waitForURL("detail/*");
+    await page.waitForURL("#/detail/*");
     await expect(page.locator("#root")).toContainText(
         "200 Patients26 Cluster 1 25 Cluster 2 43 Cluster 3 106 Cluster 4",
     );

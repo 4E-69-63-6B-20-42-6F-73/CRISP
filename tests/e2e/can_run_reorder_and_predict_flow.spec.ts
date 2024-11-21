@@ -19,12 +19,12 @@ test("with spreadsheet and correct prediction", async ({ page }) => {
     await page.getByLabel("Select Files").click();
     await page.getByRole("button", { name: "Create", exact: true }).click();
 
-    await page.waitForURL("reorder/*");
+    await page.waitForURL("#/reorder/*");
     await page.getByText("Age", { exact: true }).click();
     await page.getByText("Sex", { exact: true }).click();
     await page.getByRole("button", { name: "Finish" }).click();
 
-    await page.waitForURL("detail/*");
+    await page.waitForURL("#/detail/*");
     await expect(page.locator("#root")).toContainText(
         "100 Patients8 Cluster 1 10 Cluster 2 6 Cluster 3 76 Cluster 4",
     );

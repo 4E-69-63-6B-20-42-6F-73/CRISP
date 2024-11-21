@@ -4,7 +4,7 @@ import path from "path";
 import os from "os";
 
 test("Distribution", async ({ page }) => {
-    await page.goto("detail/1");
+    await page.goto("/#/detail/1");
     await download_matches_snapshot(
         page,
         "Distribution.png",
@@ -18,7 +18,7 @@ test("Distribution", async ({ page }) => {
 });
 
 test("Swelling", async ({ page }) => {
-    await page.goto("detail/1");
+    await page.goto("/#/detail/1");
     await download_matches_snapshot(
         page,
         "Swelling.png",
