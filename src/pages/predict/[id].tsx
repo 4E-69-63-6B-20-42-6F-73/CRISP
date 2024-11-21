@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ProgressBar } from "@fluentui/react-components";
 
 import {
@@ -20,8 +20,10 @@ export default function Predict() {
     const addPrediction = useAddPrediction();
     const [text, setText] = useState(getText("", 0, 0));
     const analyse = useGetAnalysesById(id);
-
-    const data = analyse.files.flatMap((x) => x.content as any[]);
+    const data = useMemo(
+        () => analyse.files.flatMap((x) => x.content),
+        [analyse],
+    );
 
     useEffect(() => {
         if (analyse.prediction !== undefined) {

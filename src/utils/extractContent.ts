@@ -2,6 +2,13 @@ import papa from "papaparse";
 import * as XLSX from "xlsx";
 
 export default async function ExtractContent(file: File): Promise<any[]> {
+    // Sometimes all data is returned as string, while they are numbers. So try to make everything that could be a number a number.
+    return (await extractFromFile(file)).map((x) =>
+        tryConvertPropertiesToNumber(x),
+    );
+}
+
+async function extractFromFile(file: File): Promise<any[]> {
     switch (file.type) {
         case "text/csv":
         case "application/vnd.ms-excel": // MIME type for CSVs
@@ -51,4 +58,17 @@ async function ExtractXLSX(file: File): Promise<any[]> {
         reader.onerror = (error) => reject(error);
         reader.readAsBinaryString(file);
     });
+}
+
+function tryConvertPropertiesToNumber(obj: any): any {
+    const result: any = {};
+
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            const value = obj[key];
+            result[key] = isNaN(Number(value)) ? value : Number(value);
+        }
+    }
+
+    return result;
 }

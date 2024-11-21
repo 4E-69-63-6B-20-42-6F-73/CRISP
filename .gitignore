@@ -63,3 +63,7 @@ TEST-results.xml
 .eslintcache
 *v8.log
 /lib/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
