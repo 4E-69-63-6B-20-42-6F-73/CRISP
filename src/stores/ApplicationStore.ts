@@ -9,7 +9,6 @@ const idbStorage = {
         return value ? JSON.stringify(value) : null;
     },
     setItem: async (key: string, value: string) => {
-        console.log(value);
         const parsedValue = JSON.parse(value);
         await setItem(key, parsedValue);
     },
