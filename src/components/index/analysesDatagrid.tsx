@@ -12,17 +12,67 @@ import {
     TagGroup,
     Tag,
     Avatar,
+    Button,
+    makeStyles,
 } from "@fluentui/react-components";
+import { Delete24Regular } from "@fluentui/react-icons";
 import { Analyse } from "../../types";
 import { useNavigate } from "../../router";
+import { useRemoveAnalyseWithToast } from "./removeAnalyseWithToast";
+
+const useClasses = makeStyles({
+    row: {
+        ":hover": {
+            "& button": {
+                visibility: "visible",
+                opacity: 1,
+            },
+        },
+    },
+    deleteButton: {
+        visibility: "hidden",
+        opacity: 0,
+        transition: "visibility 0.1s, opacity 0.1s ease-in-out",
+    },
+});
 
 const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
+    const removeAnalyseWithToast = useRemoveAnalyseWithToast();
+    const classes = useClasses();
+
     const navigate = useNavigate();
+
     const handleRowClick = (id: number) => {
         navigate("/detail/:id", { params: { id: id.toString() } });
     };
 
+    const handleRemoveClick = (
+        event: React.MouseEvent,
+        id: number,
+        name: string,
+    ) => {
+        event.stopPropagation();
+        removeAnalyseWithToast(id, name);
+    };
+
     const columns: TableColumnDefinition<Analyse>[] = [
+        createTableColumn<Analyse>({
+            columnId: "actions",
+            renderHeaderCell: () => "",
+            renderCell: (item) => (
+                <TableCellLayout style={{ maxWidth: "50px" }}>
+                    <Button
+                        className={classes.deleteButton}
+                        appearance="subtle"
+                        icon={<Delete24Regular />}
+                        onClick={(event) =>
+                            handleRemoveClick(event, item.id, item.name)
+                        }
+                        aria-label={`Delete ${item.name}`}
+                    />
+                </TableCellLayout>
+            ),
+        }),
         createTableColumn<Analyse>({
             columnId: "name",
             compare: (a, b) => a.name.localeCompare(b.name),
@@ -81,6 +131,14 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
 
     return (
         <DataGrid
+            resizableColumns
+            resizableColumnsOptions={{ autoFitColumns: true }}
+            columnSizingOptions={{
+                actions: {
+                    idealWidth: 32,
+                    defaultWidth: 32,
+                },
+            }}
             items={items}
             columns={columns}
             sortable
@@ -89,7 +147,7 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
             style={{ minWidth: "550px" }}
         >
             <DataGridHeader>
-                <DataGridRow>
+                <DataGridRow className={classes.row}>
                     {({ renderHeaderCell }) => (
                         <DataGridHeaderCell>
                             {renderHeaderCell()}
@@ -103,6 +161,7 @@ const AnalyseDataGrid: React.FC<{ items: Analyse[] }> = ({ items }) => {
                         key={rowId} // Use unique rowId
                         onClick={() => handleRowClick(item.id)}
                         style={{ cursor: "pointer" }}
+                        className={classes.row}
                     >
                         {({ renderCell }) => (
                             <DataGridCell>{renderCell(item)}</DataGridCell>
