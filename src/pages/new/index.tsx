@@ -16,7 +16,6 @@ import { useState } from "react";
 import { useAddAnalyse } from "@/stores/ApplicationStore";
 import extractContent from "@/utils/extractContent";
 import SpinnerButton from "@/components/SpinnerButton";
-import { Link } from "react-router-dom";
 
 const useClasses = makeStyles({
     divCreateButton: {
