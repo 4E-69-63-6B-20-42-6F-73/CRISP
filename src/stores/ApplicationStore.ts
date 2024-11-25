@@ -87,8 +87,15 @@ const useApplicationStore = create<ApplicationState>()(
                     ),
                 });
                 return () => {
+                    const currentAnalyses = get().analyses; // Ensure consistent state
+                    const before = currentAnalyses.filter(
+                        (x) => x.id < removedAnalyse.id,
+                    );
+                    const after = currentAnalyses.filter(
+                        (x) => x.id > removedAnalyse.id,
+                    );
                     set({
-                        analyses: [...get().analyses, removedAnalyse],
+                        analyses: [...before, removedAnalyse, ...after],
                     });
                 };
             },
