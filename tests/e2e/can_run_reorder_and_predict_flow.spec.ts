@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 
 // For now we check the distribution using the summary. Using the prediction table would be better, but that's flakey
-// Maybe use snapshots?
 
 test("with spreadsheet and correct prediction", async ({ page }) => {
     page.on("filechooser", async (fileChooser) => {
