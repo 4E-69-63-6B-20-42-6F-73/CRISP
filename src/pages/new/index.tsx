@@ -114,15 +114,17 @@ export default function Index() {
                     >
                         <LightbulbFilamentRegular fontSize={24} />
                         <div>
-                            <b>Hint</b> Use{" "}
-                            <Link
-                                to="/web_model/template.xlsx"
-                                target="_blank"
-                                download
-                            >
-                                this template
-                            </Link>{" "}
-                            to make sure you have the right data
+                            <span>
+                                <b>Hint</b> Use{" "}
+                                <a
+                                    href="web_model/template.xlsx"
+                                    target="_blank"
+                                    download
+                                >
+                                    this template
+                                </a>{" "}
+                                to make sure you have the right data{" "}
+                            </span>
                         </div>
                     </div>
                     <div className={classes.divCreateButton}>
