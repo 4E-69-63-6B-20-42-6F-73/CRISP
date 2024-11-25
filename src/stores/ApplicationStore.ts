@@ -20,6 +20,7 @@ interface ApplicationState {
     addAnalyse: (analyse: Omit<Analyse, "id">) => number;
     updateAnalyse: (analyse: Analyse) => void;
     addPrediction: (id: number, predictions: Prediction[]) => void;
+    removeAnalyse: (id: number) => () => void;
 
     hasLoaded: boolean; //Check to see if the data has been loaded
     setHasLoaded: (state: boolean) => void;
@@ -27,12 +28,10 @@ interface ApplicationState {
 
 const useApplicationStore = create<ApplicationState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             hasLoaded: false,
             setHasLoaded: (state: boolean) => {
-                set({
-                    hasLoaded: state,
-                });
+                set({ hasLoaded: state });
             },
             analyses: [],
             addAnalyse: (analyse: Omit<Analyse, "id">) => {
@@ -76,6 +75,23 @@ const useApplicationStore = create<ApplicationState>()(
                             : analyse,
                     ),
                 })),
+            removeAnalyse: (id: number) => {
+                const state = get();
+                const removedAnalyse = state.analyses.find(
+                    (analyse) => analyse.id === id,
+                );
+                if (!removedAnalyse) return () => {};
+                set({
+                    analyses: state.analyses.filter(
+                        (analyse) => analyse.id !== id,
+                    ),
+                });
+                return () => {
+                    set({
+                        analyses: [...get().analyses, removedAnalyse],
+                    });
+                };
+            },
         }),
         {
             name: "application-store",
@@ -113,10 +129,12 @@ const useGetAnalysesById = (id: number) => {
 
 const useAddAnalyse = () => useApplicationStore((s) => s.addAnalyse);
 const useUpdateAnalyse = () => useApplicationStore((s) => s.updateAnalyse);
+const useRemoveAnalyse = () => useApplicationStore((s) => s.removeAnalyse);
 
 const useAddPrediction = () => useApplicationStore((s) => s.addPrediction);
 
 const useHasLoaded = () => useApplicationStore((s) => s.hasLoaded);
+
 export {
     useHasLoaded,
     useAnalyses,
@@ -124,4 +142,5 @@ export {
     useUpdateAnalyse,
     useGetAnalysesById,
     useAddPrediction,
+    useRemoveAnalyse,
 };
