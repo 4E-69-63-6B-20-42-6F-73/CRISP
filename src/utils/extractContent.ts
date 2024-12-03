@@ -80,6 +80,8 @@ function tryConvertPropertiesToNumber(obj: any): any {
 
     return result;
 }
+
+// Using headers 1 on XLXS results in the first record te be the columnnames
 function removeHeaderAndRenameKeys(data: unknown[][]): any[] {
     if (!Array.isArray(data) || data.length === 0) {
         throw new Error("Invalid data: Must be a non-empty 2D array.");
