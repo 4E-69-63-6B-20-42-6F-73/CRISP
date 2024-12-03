@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { MannequinDisplay } from "../Mannequin/MannequinDisplay";
 import { expectedColumnInFile } from "@/orders";
-import { Radio, RadioGroup } from "@fluentui/react-components";
+import { Radio, RadioGroup, Text } from "@fluentui/react-components";
 import { getClusterColor } from "./clusterColerUtils";
 import { ChartToolbarWrapper } from "./ChartToolbarWrapper";
+
 import Group from "../Group";
 
 interface SwellingPainOverViewProps {
@@ -33,11 +34,67 @@ export function SwellingPainOverView({
                 defaultValue=""
                 layout="horizontal"
             >
-                <Radio value="1" label="Cluster 1" />
-                <Radio value="2" label="Cluster 2" />
-                <Radio value="3" label="Cluster 3" />
-                <Radio value="4" label="Cluster 4" />
-                <Radio value="" label="All" />
+                <Radio
+                    value="1"
+                    label={
+                        <>
+                            Cluster 1
+                            <br />
+                            <Text size={200}>
+                                Mostely feet joints are affected
+                            </Text>
+                        </>
+                    }
+                />
+                <Radio
+                    value="2"
+                    label={
+                        <>
+                            Cluster 2
+                            <br />
+                            <Text size={200}>
+                                Mostly seropositive patients and <br /> limited
+                                joint involvement
+                            </Text>
+                        </>
+                    }
+                />
+                <Radio
+                    value="3"
+                    label={
+                        <>
+                            Cluster 3
+                            <br />
+                            <Text size={200}>
+                                Symmetrical polyarthritis of hands with <br />{" "}
+                                seronegative elderly patients
+                            </Text>
+                        </>
+                    }
+                />
+                <Radio
+                    value="4"
+                    label={
+                        <>
+                            Cluster 4
+                            <br />
+                            <Text size={200}>
+                                Majority seronegative polyarthritis in hand and
+                                feet <br /> though with lower ESR.
+                            </Text>
+                        </>
+                    }
+                />
+                <Radio
+                    value=""
+                    label={
+                        <>
+                            All
+                            <br />
+                            <Text size={200}>Show all patients</Text>
+                        </>
+                    }
+                />
             </RadioGroup>
 
             <Group childHeight="500px" childWidth="400px">
