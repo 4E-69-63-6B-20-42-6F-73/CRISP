@@ -8,6 +8,12 @@ const testCases = [
             "100 Patients14 Cluster 1 11 Cluster 2 24 Cluster 3 51 Cluster 4",
     },
     {
+        name: "spreadsheet and empty cells",
+        files: "tests\\input\\dummy_data2_empty_columns.xlsx",
+        expectedText:
+            "4 Patients1 Cluster 1 1 Cluster 2 0 Cluster 3 2 Cluster 4",
+    },
+    {
         name: "csv",
         files: "tests\\input\\dummy_data.csv",
         expectedText:
