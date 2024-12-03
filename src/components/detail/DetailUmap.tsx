@@ -5,6 +5,8 @@ import { Spinner } from "@fluentui/react-components";
 import MinMaxScaler from "@/utils/minMaxScaler";
 import { cosine, euclidean } from "umap-js/dist/umap";
 
+import { ErrorCircleRegular } from "@fluentui/react-icons";
+
 type UMAPsettings = {
     nNeighbors: number;
     minDist: number;
@@ -27,6 +29,8 @@ export function DetailUmap({
 }: DetailUmapProps) {
     const [points, setPoints] = useState<Point[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         async function doUmap() {
@@ -54,8 +58,33 @@ export function DetailUmap({
             setIsLoading(false);
         }
 
-        doUmap();
+        doUmap().catch((e) => setError(e));
     }, [data, clusters, patientIds, settings]);
+
+    if (error !== null) {
+        return (
+            <div
+                style={{
+                    padding: "5px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                <div
+                    style={{
+                        color: "var(--colorPaletteRedForeground3)",
+                        fontSize: "xxx-large",
+                    }}
+                >
+                    {" "}
+                    <ErrorCircleRegular />{" "}
+                </div>
+                <b>Something went wrong. </b>
+                Error: {error.message}
+            </div>
+        );
+    }
 
     return (
         <>
