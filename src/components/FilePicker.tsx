@@ -12,6 +12,7 @@ import {
     AttachFilled,
     WarningFilled,
     CheckmarkFilled,
+    ClockFilled,
 } from "@fluentui/react-icons";
 
 type ValidFile = {
@@ -19,6 +20,14 @@ type ValidFile = {
     fileName: string;
     content: any[];
     isValid: true;
+};
+
+type PendingFile = {
+    file: File;
+    fileName: string;
+    content: any[];
+    isValid: false;
+    reason: "Processing";
 };
 
 type InvalidFile = {
@@ -46,7 +55,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
 }) => {
     const fileUploader = useRef<HTMLInputElement | null>(null);
     const [selectedFiles, setSelectedFiles] = useState<
-        (ValidFile | InvalidFile)[]
+        (ValidFile | InvalidFile | PendingFile)[]
     >([]);
 
     const handleAddClick = () => {
@@ -55,83 +64,129 @@ export const FilePicker: React.FC<FilePickerProps> = ({
         }
     };
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const newFiles = Array.from(e.target.files);
 
-            // Deduplicate by file name
             const updatedFiles = [...selectedFiles];
             const seenNames = new Set(updatedFiles.map((f) => f.fileName));
+
+            // Add files as PendingFile initially
             for (const file of newFiles) {
                 if (!seenNames.has(file.name)) {
                     seenNames.add(file.name);
-                    const validatedFile = await isFileValid(file);
-                    updatedFiles.push(validatedFile);
+                    updatedFiles.push({
+                        file,
+                        fileName: file.name,
+                        content: [],
+                        isValid: false,
+                        reason: "Processing",
+                    } as PendingFile);
                 }
             }
 
             setSelectedFiles(updatedFiles);
-            onfilechange && onfilechange(updatedFiles);
+
+            // Process files asynchronously
+            processFiles(newFiles);
         }
     };
 
-    const handleRemoveFile = (fileToRemove: ValidFile | InvalidFile) => {
+    const processFiles = async (files: File[]) => {
+        const updatedFiles = [...selectedFiles];
+
+        for (const file of files) {
+            const validatedFile = await isFileValid(file);
+
+            // Update state with the validated file
+            setSelectedFiles((prevFiles) =>
+                prevFiles.map((f) =>
+                    f.fileName === validatedFile.fileName ? validatedFile : f,
+                ),
+            );
+
+            // Notify parent of changes
+            onfilechange &&
+                onfilechange(
+                    updatedFiles.filter(
+                        (f) =>
+                            f.isValid !== false ||
+                            (f as InvalidFile).reason !== "Processing",
+                    ) as (ValidFile | InvalidFile)[],
+                );
+        }
+    };
+
+    const handleRemoveFile = (
+        fileToRemove: ValidFile | InvalidFile | PendingFile,
+    ) => {
         const updatedFiles = selectedFiles.filter(
             (file) => file.fileName !== fileToRemove.fileName,
         );
         setSelectedFiles(updatedFiles);
-        onfilechange && onfilechange(updatedFiles);
+        onfilechange &&
+            onfilechange(
+                updatedFiles.filter(
+                    (f) =>
+                        f.isValid !== false ||
+                        (f as InvalidFile).reason !== "Processing",
+                ) as (ValidFile | InvalidFile)[],
+            );
     };
 
-    function renderValidFile(file: ValidFile): any {
+    function renderPendingFile(file: PendingFile): JSX.Element {
         return (
-            <>
+            <Tag
+                key={file.fileName}
+                shape="rounded"
+                value={file.fileName}
+                icon={<ClockFilled />}
+            >
+                {file.fileName}
+            </Tag>
+        );
+    }
+
+    function renderValidFile(file: ValidFile): JSX.Element {
+        return (
+            <Tag
+                key={file.fileName}
+                onClick={() => handleRemoveFile(file)}
+                shape="rounded"
+                value={file.fileName}
+                icon={
+                    <CheckmarkFilled
+                        aria-label="Valid file"
+                        style={{ color: "green" }}
+                    />
+                }
+            >
+                {file.fileName}
+            </Tag>
+        );
+    }
+
+    function renderInvalidFile(file: InvalidFile): JSX.Element {
+        return (
+            <Tooltip
+                key={file.fileName}
+                content={file.reason}
+                relationship="label"
+            >
                 <Tag
-                    onClick={() => {
-                        const newFiles = selectedFiles.filter(
-                            (x) => x !== file,
-                        );
-                        setSelectedFiles(newFiles);
-                        onfilechange && onfilechange(newFiles); // Call onfilechange when a file is removed
-                    }}
-                    key={file.fileName}
+                    onClick={() => handleRemoveFile(file)}
                     shape="rounded"
                     value={file.fileName}
                     icon={
-                        <CheckmarkFilled
+                        <WarningFilled
                             aria-label="Invalid file"
-                            style={{ color: "green" }}
+                            style={{ color: "orange" }}
                         />
                     }
                 >
                     {file.fileName}
                 </Tag>
-            </>
-        );
-    }
-    function renderInvalidFile(file: InvalidFile): any {
-        return (
-            <>
-                <Tooltip
-                    key={file.fileName}
-                    content={file.reason}
-                    relationship="label"
-                >
-                    <Tag
-                        onClick={() => handleRemoveFile(file)}
-                        shape="rounded"
-                        value={file.fileName}
-                        icon={
-                            <WarningFilled
-                                aria-label="Invalid file"
-                                style={{ color: "orange" }}
-                            />
-                        }
-                    >
-                        {file.fileName}
-                    </Tag>
-                </Tooltip>
-            </>
+            </Tooltip>
         );
     }
 
@@ -156,11 +211,19 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                 <TagPicker noPopover selectedOptions={[""]}>
                     <TagPickerControl style={{ width: "100%" }}>
                         <TagPickerGroup aria-label="Selected Files">
-                            {selectedFiles.map((file) =>
-                                file.isValid
+                            {selectedFiles.map((file) => {
+                                if (
+                                    (file as PendingFile).reason ===
+                                    "Processing"
+                                ) {
+                                    return renderPendingFile(
+                                        file as PendingFile,
+                                    );
+                                }
+                                return file.isValid
                                     ? renderValidFile(file as ValidFile)
-                                    : renderInvalidFile(file as InvalidFile),
-                            )}
+                                    : renderInvalidFile(file as InvalidFile);
+                            })}
                         </TagPickerGroup>
                         <TagPickerInput
                             aria-label="Select Files"
