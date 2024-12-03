@@ -100,7 +100,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                     icon={
                         <CheckmarkFilled
                             aria-label="Invalid file"
-                            style={{ color: "greem" }}
+                            style={{ color: "green" }}
                         />
                     }
                 >
