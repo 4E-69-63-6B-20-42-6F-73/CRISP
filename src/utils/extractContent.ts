@@ -51,7 +51,11 @@ async function ExtractXLSX(file: File): Promise<any[]> {
                 );
 
                 const json = sheetnames.flatMap((x) =>
-                    XLSX.utils.sheet_to_json(workbook.Sheets[x]),
+                    removeHeaderAndRenameKeys(
+                        XLSX.utils.sheet_to_json(workbook.Sheets[x], {
+                            header: 1,
+                        }),
+                    ),
                 );
                 resolve(json as any[]);
             } catch (error) {
@@ -75,4 +79,31 @@ function tryConvertPropertiesToNumber(obj: any): any {
     }
 
     return result;
+}
+
+// Using headers 1 on XLXS results in the first record te be the columnnames
+function removeHeaderAndRenameKeys(data: unknown[][]): any[] {
+    if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("Invalid data: Must be a non-empty 2D array.");
+    }
+
+    // Extract and remove the header row
+    const columnMapping = data.shift() as string[];
+
+    if (!Array.isArray(columnMapping) || columnMapping.length === 0) {
+        throw new Error(
+            "Invalid header: The first row must contain column names.",
+        );
+    }
+
+    // Map data rows to objects based on the column mapping
+    return data.map((row) => {
+        return columnMapping.reduce(
+            (acc, colName, index) => {
+                acc[colName] = row[index] || null; // Default to null for missing values
+                return acc;
+            },
+            {} as Record<string, any>,
+        );
+    });
 }
