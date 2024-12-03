@@ -88,12 +88,16 @@ export default function Index() {
                 isValid: true,
             } as ValidFile;
         } else {
+            const formattedMissingColumns =
+                missingColumns.length > 2
+                    ? `${missingColumns.slice(0, 2).join(", ")}, + ${missingColumns.length - 2} more`
+                    : missingColumns.join(", ");
             return {
                 file,
                 fileName: file.name,
                 content,
                 isValid: false,
-                reason: `Missing columns: ${missingColumns.join(", ")}`,
+                reason: `Missing columns: ${formattedMissingColumns}`,
             } as InvalidFile;
         }
     }
