@@ -14,6 +14,7 @@ import {
     CheckmarkFilled,
     ClockFilled,
 } from "@fluentui/react-icons";
+import { tokens } from "@fluentui/react-theme";
 
 type ValidFile = {
     file: File;
@@ -71,7 +72,6 @@ export const FilePicker: React.FC<FilePickerProps> = ({
             const updatedFiles = [...selectedFiles];
             const seenNames = new Set(updatedFiles.map((f) => f.fileName));
 
-            // Add files as PendingFile initially
             for (const file of newFiles) {
                 if (!seenNames.has(file.name)) {
                     seenNames.add(file.name);
@@ -86,8 +86,6 @@ export const FilePicker: React.FC<FilePickerProps> = ({
             }
 
             setSelectedFiles(updatedFiles);
-
-            // Process files asynchronously
             processFiles(newFiles);
         }
     };
@@ -98,14 +96,12 @@ export const FilePicker: React.FC<FilePickerProps> = ({
         for (const file of files) {
             const validatedFile = await isFileValid(file);
 
-            // Update state with the validated file
             setSelectedFiles((prevFiles) =>
                 prevFiles.map((f) =>
                     f.fileName === validatedFile.fileName ? validatedFile : f,
                 ),
             );
 
-            // Notify parent of changes
             onfilechange &&
                 onfilechange(
                     updatedFiles.filter(
@@ -156,8 +152,9 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                 value={file.fileName}
                 icon={
                     <CheckmarkFilled
-                        aria-label="Valid file"
-                        style={{ color: "green" }}
+                        style={{
+                            color: tokens.colorPaletteGreenForeground1,
+                        }}
                     />
                 }
             >
@@ -179,8 +176,9 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                     value={file.fileName}
                     icon={
                         <WarningFilled
-                            aria-label="Invalid file"
-                            style={{ color: "orange" }}
+                            style={{
+                                color: tokens.colorPaletteRedForeground1,
+                            }}
                         />
                     }
                 >
