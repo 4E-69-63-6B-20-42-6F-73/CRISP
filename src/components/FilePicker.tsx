@@ -84,33 +84,27 @@ export const FilePicker: React.FC<FilePickerProps> = ({
                     } as PendingFile);
                 }
             }
-
-            setSelectedFiles(updatedFiles);
-            processFiles(newFiles);
+            processFiles(updatedFiles);
         }
     };
 
-    const processFiles = async (files: File[]) => {
-        const updatedFiles = [...selectedFiles];
+    const processFiles = async (
+        files: (ValidFile | InvalidFile | PendingFile)[],
+    ) => {
+        let updatedFiles = [...files];
 
+        // Here we set all the files as pending
+        setSelectedFiles(updatedFiles);
         for (const file of files) {
-            const validatedFile = await isFileValid(file);
+            const validatedFile = await isFileValid(file.file);
 
-            setSelectedFiles((prevFiles) =>
-                prevFiles.map((f) =>
-                    f.fileName === validatedFile.fileName ? validatedFile : f,
-                ),
+            updatedFiles = updatedFiles.map((f) =>
+                f.fileName === validatedFile.fileName ? validatedFile : f,
             );
-
-            onfilechange &&
-                onfilechange(
-                    updatedFiles.filter(
-                        (f) =>
-                            f.isValid !== false ||
-                            (f as InvalidFile).reason !== "Processing",
-                    ) as (ValidFile | InvalidFile)[],
-                );
         }
+        // Here we know if they are valid or not
+        setSelectedFiles(updatedFiles);
+        onfilechange && onfilechange(updatedFiles);
     };
 
     const handleRemoveFile = (
@@ -120,14 +114,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
             (file) => file.fileName !== fileToRemove.fileName,
         );
         setSelectedFiles(updatedFiles);
-        onfilechange &&
-            onfilechange(
-                updatedFiles.filter(
-                    (f) =>
-                        f.isValid !== false ||
-                        (f as InvalidFile).reason !== "Processing",
-                ) as (ValidFile | InvalidFile)[],
-            );
+        onfilechange && onfilechange(updatedFiles);
     };
 
     function renderPendingFile(file: PendingFile): JSX.Element {
