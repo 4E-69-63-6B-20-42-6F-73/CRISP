@@ -13,8 +13,13 @@ class MinMaxScaler {
     }
 
     transform(data: number[]): number[] {
+        const range = this.max - this.min;
+        if (range === 0) {
+            // All values are the same, return an array of zeros
+            return data.map(() => 0);
+        }
         return data.map((value) => {
-            return (value - this.min) / (this.max - this.min);
+            return (value - this.min) / range;
         });
     }
 
@@ -24,8 +29,12 @@ class MinMaxScaler {
     }
 
     inverseTransform(scaledData: number[]): number[] {
+        const range = this.max - this.min;
+        if (range === 0) {
+            return scaledData.map(() => this.min);
+        }
         return scaledData.map((value) => {
-            return value * (this.max - this.min) + this.min;
+            return value * range + this.min;
         });
     }
 }
