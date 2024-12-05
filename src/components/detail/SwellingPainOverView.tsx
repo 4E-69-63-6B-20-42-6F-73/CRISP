@@ -41,7 +41,7 @@ export function SwellingPainOverView({
                             Cluster 1
                             <br />
                             <Text size={200}>
-                                Mostely feet joints are affected
+                                Mostly feet joints are affected
                             </Text>
                         </>
                     }
