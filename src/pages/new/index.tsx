@@ -16,6 +16,8 @@ import { useState } from "react";
 import { useAddAnalyse } from "@/stores/ApplicationStore";
 import extractContent from "@/utils/extractContent";
 import SpinnerButton from "@/components/SpinnerButton";
+import setsAreEqual from "@/utils/setsAreEqual";
+import { expectedColumnInFile } from "@/orders";
 
 const useClasses = makeStyles({
     divCreateButton: {
@@ -36,6 +38,21 @@ const useClasses = makeStyles({
     },
 });
 
+type ValidFile = {
+    file: File;
+    fileName: string;
+    content: any[];
+    isValid: true;
+};
+
+type InvalidFile = {
+    file: File;
+    fileName: string;
+    content: any[];
+    isValid: false;
+    reason: string;
+};
+
 export default function Index() {
     const navigate = useNavigate();
     const classes = useClasses();
@@ -43,20 +60,54 @@ export default function Index() {
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [files, setFiles] = useState<File[]>([]);
+    const [files, setFiles] = useState<(ValidFile | InvalidFile)[]>([]);
+
+    async function isValidFile(file: File): Promise<ValidFile | InvalidFile> {
+        const content = await extractContent(file);
+
+        if (content.length === 0) {
+            return {
+                file,
+                fileName: file.name,
+                content,
+                isValid: false,
+                reason: "The file is empty.",
+            } as InvalidFile;
+        }
+
+        const fileColumns = new Set(Object.keys(content[0]));
+        const missingColumns = Array.from(expectedColumnInFile).filter(
+            (column) => !fileColumns.has(column),
+        );
+
+        if (missingColumns.length === 0) {
+            return {
+                file,
+                fileName: file.name,
+                content,
+                isValid: true,
+            } as ValidFile;
+        } else {
+            const formattedMissingColumns =
+                missingColumns.length > 2
+                    ? `${missingColumns.slice(0, 2).join(", ")}, + ${missingColumns.length - 2} more`
+                    : missingColumns.join(", ");
+            return {
+                file,
+                fileName: file.name,
+                content,
+                isValid: false,
+                reason: `Missing columns: ${formattedMissingColumns}`,
+            } as InvalidFile;
+        }
+    }
 
     const handleCreate = async () => {
         const id = addAnalyse({
             name: name,
             description: description,
             created: new Date(),
-            files: await Promise.all(
-                files.map(async (x) => ({
-                    file: x,
-                    fileName: x.name,
-                    content: await extractContent(x),
-                })),
-            ),
+            files: files,
         });
 
         navigate("/predict/:id", { params: { id: id.toString() } });
@@ -97,6 +148,7 @@ export default function Index() {
                         accept=".txt, .csv, .xls, .xlsx, text/plain, text/csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         required
                         onfilechange={(newFiles) => setFiles(newFiles)}
+                        isFileValid={isValidFile}
                     />
 
                     <div
@@ -130,7 +182,11 @@ export default function Index() {
                         <SpinnerButton
                             appearance="primary"
                             icon={<AddFilled />}
-                            disabled={name === "" || files.length === 0}
+                            disabled={
+                                name === "" ||
+                                files.length === 0 ||
+                                files.some((x) => !x.isValid)
+                            }
                             onClick={handleCreate}
                         >
                             Create

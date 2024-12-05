@@ -29,14 +29,6 @@ export default function Predict() {
         if (analyse.prediction !== undefined) {
             navigate("/detail/:id", { params: { id: id.toString() } });
         }
-        if (
-            !setsAreEqual(
-                new Set(expectedColumnInFile),
-                new Set(Object.keys(analyse.files[0].content[0])),
-            )
-        ) {
-            navigate("/reorder/:id", { params: { id: id.toString() } });
-        }
 
         const cleanup = predict({
             data,
