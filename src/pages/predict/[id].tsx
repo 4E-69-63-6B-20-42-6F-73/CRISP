@@ -7,8 +7,6 @@ import {
 } from "@/stores/ApplicationStore";
 
 import { useNavigate, useParams } from "@/router";
-import { expectedColumnInFile } from "@/orders";
-import setsAreEqual from "@/utils/setsAreEqual";
 import { predict } from "@/utils/predict";
 
 export default function Predict() {
