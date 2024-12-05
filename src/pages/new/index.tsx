@@ -16,7 +16,6 @@ import { useState } from "react";
 import { useAddAnalyse } from "@/stores/ApplicationStore";
 import extractContent from "@/utils/extractContent";
 import SpinnerButton from "@/components/SpinnerButton";
-import setsAreEqual from "@/utils/setsAreEqual";
 import { expectedColumnInFile } from "@/orders";
 
 const useClasses = makeStyles({
