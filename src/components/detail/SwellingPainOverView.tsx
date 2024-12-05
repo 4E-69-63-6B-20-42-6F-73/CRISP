@@ -15,14 +15,17 @@ export function SwellingPainOverView({
     data,
     clusters,
 }: SwellingPainOverViewProps) {
-    const [swelling, pain] = seperateZwellingAndPijn(data);
-
     const [filtering, setFiltering] = useState<number | null>(null);
 
-    const averageSwelling = MeanOfRecord(
-        applyFiltering(swelling, clusters, filtering),
-    );
-    const averagePain = MeanOfRecord(applyFiltering(pain, clusters, filtering));
+    const filtered_data = applyFiltering(data, clusters, filtering);
+
+    const [swelling, pain] = seperateZwellingAndPijn(filtered_data);
+    const averageSwelling = MeanOfRecord(swelling);
+    const averagePain = MeanOfRecord(pain);
+
+    const averages = MeanOfRecord(filtered_data);
+
+    console.log(JSON.stringify(data));
 
     return (
         <>
@@ -58,6 +61,8 @@ export function SwellingPainOverView({
                         fillColor={getClusterColor(filtering)}
                     ></MannequinDisplay>
                 </ChartToolbarWrapper>
+
+                <></>
             </Group>
         </>
     );
@@ -78,16 +83,9 @@ function seperateZwellingAndPijn(
         (x) =>
             Object.fromEntries(
                 Object.entries(x)
-                    .filter(([key, _]) =>
-                        expectedColumnInFile[Number(key)].startsWith(
-                            "Zwelling",
-                        ),
-                    )
+                    .filter(([key, _]) => key.startsWith("Zwelling"))
                     .map(([key, value]) => [
-                        expectedColumnInFile[Number(key)].replace(
-                            "Zwelling_",
-                            "",
-                        ),
+                        key.replace("Zwelling_", ""),
                         value as number,
                     ]),
             ) as Record<string, number>,
@@ -97,11 +95,9 @@ function seperateZwellingAndPijn(
         (x) =>
             Object.fromEntries(
                 Object.entries(x)
-                    .filter(([key, _]) =>
-                        expectedColumnInFile[Number(key)].startsWith("Pijn"),
-                    )
+                    .filter(([key, _]) => key.startsWith("Pijn"))
                     .map(([key, value]) => [
-                        expectedColumnInFile[Number(key)].replace("Pijn_", ""),
+                        key.replace("Pijn_", ""),
                         value as number,
                     ]),
             ) as Record<string, number>,

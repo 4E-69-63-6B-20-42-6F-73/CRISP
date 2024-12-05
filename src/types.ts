@@ -1,3 +1,5 @@
+import { expectedColumnInFile } from "./orders";
+
 type Analyse = {
     id: number;
     name: string;
@@ -7,15 +9,18 @@ type Analyse = {
     prediction?: Prediction[];
 };
 
-// Since we are working with CSV or XLSX we can have diffrent columns.
+type FileInput = {
+    [K in (typeof expectedColumnInFile)[number]]: any;
+};
+
 type FileWithContent = {
-    file: File | undefined; // Note this one is undefined after a while. So we should add a filename.
+    file: File | undefined; // Note this one is undefined after a while.
     fileName: string;
-    content: any[];
+    content: FileInput[];
 };
 
 type Prediction = {
     patientId: string;
     prediction: number;
 };
-export type { Analyse, Prediction };
+export type { Analyse, Prediction, FileInput };

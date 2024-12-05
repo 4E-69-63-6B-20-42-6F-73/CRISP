@@ -16,8 +16,9 @@ import { useState } from "react";
 import { useAddAnalyse } from "@/stores/ApplicationStore";
 import extractContent from "@/utils/extractContent";
 import SpinnerButton from "@/components/SpinnerButton";
-import setsAreEqual from "@/utils/setsAreEqual";
 import { expectedColumnInFile } from "@/orders";
+
+import { FileInput } from "@/types";
 
 const useClasses = makeStyles({
     divCreateButton: {
@@ -41,7 +42,7 @@ const useClasses = makeStyles({
 type ValidFile = {
     file: File;
     fileName: string;
-    content: any[];
+    content: FileInput[];
     isValid: true;
 };
 
@@ -84,7 +85,7 @@ export default function Index() {
             return {
                 file,
                 fileName: file.name,
-                content,
+                content: content as FileInput[],
                 isValid: true,
             } as ValidFile;
         } else {
