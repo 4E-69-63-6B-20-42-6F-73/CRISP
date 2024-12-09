@@ -11,7 +11,22 @@ import {
     Indicator,
     RangeGraph,
     RangeIndicator,
+    StandardDeviationIndicator,
 } from "../RangeGraph";
+import { standardDeviation } from "@/utils/standardDeviation";
+
+const pallete = [
+    "#fd7f6f",
+    "#7eb0d5",
+    "#b2e061",
+    "#adebb3",
+    "#ffb55a",
+    "#808080",
+    "#beb9db",
+    "#fdcce5",
+    "#8bd3c7",
+    "#bd7ebe",
+];
 
 const parameterConfig = [
     {
@@ -19,41 +34,36 @@ const parameterConfig = [
         minValue: 0,
         maxValue: 20,
         acceptedRange: [4, 10],
-        color: "orange",
     },
     {
         label: "Hb",
         minValue: 0,
         maxValue: 20,
         acceptedRange: [8, 10],
-        color: "blue",
     },
     {
         label: "MCV",
         minValue: 50,
         maxValue: 250,
         acceptedRange: [80, 100],
-        color: "green",
     },
     {
         label: "Trom",
         minValue: 0,
         maxValue: 1100,
         acceptedRange: [150, 400],
-        color: "purple",
     },
     {
         label: "BSE",
         minValue: 0,
         maxValue: 140,
         acceptedRange: [0, 25],
-        color: "red",
     },
     {
         label: "Age",
         minValue: 0,
         maxValue: 120,
-        color: "gray",
+        // color: "gray",
     },
 ];
 
@@ -74,8 +84,8 @@ export function SwellingPainOverView({
     const averageSwelling = MeanOfRecord(swelling);
     const averagePain = MeanOfRecord(pain);
 
-    const all_averages = MeanOfRecord(data);
     const averages = MeanOfRecord(filtered_data);
+
     return (
         <>
             <RadioGroup
@@ -167,7 +177,7 @@ export function SwellingPainOverView({
                     ></MannequinDisplay>
                 </ChartToolbarWrapper>
 
-                <>
+                <ChartToolbarWrapper title={" ??? "}>
                     <div
                         style={{
                             display: "flex",
@@ -177,13 +187,10 @@ export function SwellingPainOverView({
                         }}
                     >
                         {parameterConfig.map(
-                            ({
-                                label,
-                                minValue,
-                                maxValue,
-                                acceptedRange,
-                                color,
-                            }) => (
+                            (
+                                { label, minValue, maxValue, acceptedRange },
+                                i,
+                            ) => (
                                 <RangeGraph
                                     key={label}
                                     label={label}
@@ -201,7 +208,7 @@ export function SwellingPainOverView({
                                                 (x) => x[label] as number,
                                             ),
                                         )}
-                                        color={color}
+                                        color={pallete[i]}
                                     />
                                     {acceptedRange && (
                                         <RangeIndicator
@@ -210,10 +217,18 @@ export function SwellingPainOverView({
                                         />
                                     )}
                                     <Indicator x={averages[label]} />
+                                    <StandardDeviationIndicator
+                                        sd={standardDeviation(
+                                            filtered_data.map(
+                                                (x) => x[label] as number,
+                                            ),
+                                            filtering === null,
+                                        )}
+                                        average={averages[label]}
+                                    />
                                 </RangeGraph>
                             ),
                         )}
-                        {/* Do we want this in absolute or percentage?? */}
 
                         <RangeGraph label="Sex" minValue={0} maxValue={100}>
                             <FilledBar
@@ -249,7 +264,7 @@ export function SwellingPainOverView({
                                         filtered_data.length) *
                                     100
                                 }
-                                color={"brown"}
+                                color={pallete[8]}
                             />
                             <FilledBar
                                 start={
@@ -272,7 +287,7 @@ export function SwellingPainOverView({
                                         filtered_data.length) *
                                     100
                                 }
-                                color={"turquoise"}
+                                color={pallete[9]}
                             />
                             <FilledBar
                                 start={
@@ -286,7 +301,7 @@ export function SwellingPainOverView({
                             />
                         </RangeGraph>
                     </div>
-                </>
+                </ChartToolbarWrapper>
             </Group>
         </>
     );
