@@ -25,6 +25,12 @@ type StandardDeviationIndicatorProps = {
     color?: string;
 };
 
+type TriangleProps = {
+    size: number;
+    color?: string;
+    rotation?: number;
+};
+
 const scale = (
     value: number,
     domain: [number, number],
@@ -52,7 +58,7 @@ const FilledBar: React.FC<
     return (
         <rect
             x={startPercentage + "%"}
-            y={"25%"}
+            y={"35%"}
             width={filledWidth + "%"}
             height={height}
             fill={color}
@@ -64,20 +70,11 @@ const FilledBar: React.FC<
 const Indicator: React.FC<
     IndicatorProps & { minValue?: number; maxValue?: number }
 > = ({ x, minValue = 0, maxValue = 100, color = "blue" }) => {
-    const height = 12;
     const x_position = scale(x, [minValue, maxValue], [0, 100]);
-    const triangleSize = 1.5 * (height / 4);
-    const trianglePath = d3
-        .symbol()
-        .type(d3.symbolTriangle)
-        .size(triangleSize * 10)();
-
     return (
         <>
-            <svg x={x_position + "%"} y="5%" overflow="visible">
-                <g transform="rotate(180)">
-                    <path d={trianglePath || ""} fill={color} />
-                </g>
+            <svg x={x_position + "%"} y="0%">
+                <Triangle rotation={180} size={50} color={color} />
             </svg>
         </>
     );
@@ -87,27 +84,20 @@ const Indicator: React.FC<
 const RangeIndicator: React.FC<
     RangeIndicatorProps & { minValue?: number; maxValue?: number }
 > = ({ start, end, minValue = 0, maxValue = 100, color = "purple" }) => {
-    const height = 12;
-    const x_start = scale(start, [minValue, maxValue], [0, 100]);
-    const x_end = scale(end, [minValue, maxValue], [0, 100]);
-    const triangleSize = 1.5 * (height / 4);
-    const trianglePath = d3
-        .symbol()
-        .type(d3.symbolTriangle)
-        .size(triangleSize * 10)();
-
     return (
         <>
-            <svg x={x_start + "%"} y="75%" overflow="visible">
-                <g>
-                    <path d={trianglePath || ""} fill={color} />
-                </g>
-            </svg>
-            <svg x={x_end + "%"} y="75%" overflow="visible">
-                <g>
-                    <path d={trianglePath || ""} fill={color} />
-                </g>
-            </svg>
+            <Indicator
+                x={start}
+                color={color}
+                minValue={minValue}
+                maxValue={maxValue}
+            />
+            <Indicator
+                x={end}
+                color={color}
+                minValue={minValue}
+                maxValue={maxValue}
+            />
         </>
     );
 };
@@ -128,15 +118,15 @@ const StandardDeviationIndicator: React.FC<
             {/* Left vertical line */}
             <rect
                 x={x_begin + "%"}
-                y={"30%"} //
-                width={"0.5%"}
+                y={"40%"} //
+                width={height}
                 height={"20%"}
                 fill={color}
             />
             {/* Horizontal line */}
             <rect
                 x={x_begin + "%"}
-                y={"37%"} // center of filled bar
+                y={"47%"} // center of filled bar
                 width={width + "%"}
                 height={height}
                 fill={color}
@@ -144,12 +134,30 @@ const StandardDeviationIndicator: React.FC<
             {/* Right vertical line */}
             <rect
                 x={x_begin + width + "%"}
-                y={"30%"} //
-                width={"0.5%"}
+                y={"40%"} //
+                width={height}
                 height={"20%"}
                 fill={color}
             />
         </>
+    );
+};
+
+const Triangle: React.FC<TriangleProps> = ({
+    size,
+    color = "blue",
+    rotation = 0,
+}) => {
+    const trianglePath = d3.symbol().type(d3.symbolTriangle).size(size)();
+
+    return (
+        <svg width={size / 4} height={size / 4}>
+            <g
+                transform={`translate(${size / 8}, ${size / 8}) rotate(${rotation})`}
+            >
+                <path d={trianglePath || ""} fill={color} />
+            </g>
+        </svg>
     );
 };
 
@@ -238,4 +246,5 @@ export {
     RangeIndicator,
     Indicator,
     StandardDeviationIndicator,
+    Triangle,
 };
