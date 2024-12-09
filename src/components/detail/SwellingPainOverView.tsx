@@ -1,13 +1,63 @@
 import { useState } from "react";
 import { MannequinDisplay } from "../Mannequin/MannequinDisplay";
-import { expectedColumnInFile } from "@/orders";
 import { Radio, RadioGroup } from "@fluentui/react-components";
 import { getClusterColor } from "./clusterColerUtils";
 import { ChartToolbarWrapper } from "./ChartToolbarWrapper";
 import Group from "../Group";
+import { FileInput } from "@/types";
+import {
+    FilledBar,
+    Indicator,
+    RangeGraph,
+    RangeIndicator,
+} from "../RangeGraph";
+
+const parameterConfig = [
+    {
+        label: "Leuko",
+        minValue: 0,
+        maxValue: 20,
+        acceptedRange: [4, 10],
+        color: "orange",
+    },
+    {
+        label: "Hb",
+        minValue: 0,
+        maxValue: 20,
+        acceptedRange: [8, 10],
+        color: "blue",
+    },
+    {
+        label: "MCV",
+        minValue: 50,
+        maxValue: 250,
+        acceptedRange: [80, 100],
+        color: "green",
+    },
+    {
+        label: "Trom",
+        minValue: 0,
+        maxValue: 1100,
+        acceptedRange: [150, 400],
+        color: "purple",
+    },
+    {
+        label: "BSE",
+        minValue: 0,
+        maxValue: 140,
+        acceptedRange: [0, 25],
+        color: "red",
+    },
+    {
+        label: "Age",
+        minValue: 0,
+        maxValue: 120,
+        color: "gray",
+    },
+];
 
 interface SwellingPainOverViewProps {
-    data: any[];
+    data: FileInput[];
     clusters: number[];
 }
 
@@ -23,10 +73,8 @@ export function SwellingPainOverView({
     const averageSwelling = MeanOfRecord(swelling);
     const averagePain = MeanOfRecord(pain);
 
+    const all_averages = MeanOfRecord(data);
     const averages = MeanOfRecord(filtered_data);
-
-    console.log(JSON.stringify(data));
-
     return (
         <>
             <RadioGroup
@@ -62,7 +110,126 @@ export function SwellingPainOverView({
                     ></MannequinDisplay>
                 </ChartToolbarWrapper>
 
-                <></>
+                <>
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "20px",
+                            flexDirection: "column",
+                            height: "inherit",
+                        }}
+                    >
+                        {parameterConfig.map(
+                            ({
+                                label,
+                                minValue,
+                                maxValue,
+                                acceptedRange,
+                                color,
+                            }) => (
+                                <RangeGraph
+                                    key={label}
+                                    label={label}
+                                    minValue={minValue}
+                                    maxValue={maxValue}
+                                >
+                                    <FilledBar
+                                        start={Math.min(
+                                            ...filtered_data.map(
+                                                (x) => x[label] as number,
+                                            ),
+                                        )}
+                                        end={Math.max(
+                                            ...filtered_data.map(
+                                                (x) => x[label] as number,
+                                            ),
+                                        )}
+                                        color={color}
+                                    />
+                                    {acceptedRange && (
+                                        <RangeIndicator
+                                            start={acceptedRange[0]}
+                                            end={acceptedRange[1]}
+                                        />
+                                    )}
+                                    <Indicator x={averages[label]} />
+                                </RangeGraph>
+                            ),
+                        )}
+                        {/* Do we want this in absolute or percentage?? */}
+
+                        <RangeGraph label="Sex" minValue={0} maxValue={100}>
+                            <FilledBar
+                                start={0}
+                                end={
+                                    (filtered_data.filter(
+                                        (x) => x.Sex[0] === "M",
+                                    ).length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                color={"lightblue"}
+                            />
+                            <FilledBar
+                                start={
+                                    (filtered_data.filter(
+                                        (x) => x.Sex[0] === "M",
+                                    ).length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                end={100}
+                                color={"pink"}
+                            />
+                        </RangeGraph>
+
+                        <RangeGraph label="RF" minValue={0} maxValue={100}>
+                            <FilledBar
+                                start={0}
+                                end={
+                                    (filtered_data.filter((x) => x.RF === 1)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                color={"brown"}
+                            />
+                            <FilledBar
+                                start={
+                                    (filtered_data.filter((x) => x.RF === 1)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                end={100}
+                                color={"lightgray"}
+                            />
+                        </RangeGraph>
+
+                        <RangeGraph label="aCCP" minValue={0} maxValue={100}>
+                            <FilledBar
+                                start={0}
+                                end={
+                                    (filtered_data.filter((x) => x.aCCP === 1)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                color={"turquoise"}
+                            />
+                            <FilledBar
+                                start={
+                                    (filtered_data.filter((x) => x.aCCP === 1)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                end={100}
+                                color={"lightgray"}
+                            />
+                        </RangeGraph>
+                    </div>
+                </>
             </Group>
         </>
     );
@@ -120,11 +287,11 @@ function MeanOfRecord(data: Record<string, number>[]) {
 
     return means;
 }
-function applyFiltering(
-    data: Record<string, number>[],
+function applyFiltering<T>(
+    data: T[],
     clusters: number[],
     filtering: number | null,
-): Record<string, number>[] {
+): T[] {
     return filtering != null
         ? data.filter((_, index) => clusters[index] == filtering)
         : data;
