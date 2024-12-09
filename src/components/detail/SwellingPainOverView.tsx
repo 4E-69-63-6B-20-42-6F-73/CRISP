@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { MannequinDisplay } from "../Mannequin/MannequinDisplay";
 import { Radio, RadioGroup, Text } from "@fluentui/react-components";
 import { getClusterColor } from "./clusterColerUtils";
@@ -12,6 +12,7 @@ import {
     RangeGraph,
     RangeIndicator,
     StandardDeviationIndicator,
+    Triangle,
 } from "../RangeGraph";
 import { standardDeviation } from "@/utils/standardDeviation";
 
@@ -63,7 +64,6 @@ const parameterConfig = [
         label: "Age",
         minValue: 0,
         maxValue: 120,
-        // color: "gray",
     },
 ];
 
@@ -177,7 +177,7 @@ export function SwellingPainOverView({
                     ></MannequinDisplay>
                 </ChartToolbarWrapper>
 
-                <ChartToolbarWrapper title={" ??? "}>
+                <ChartToolbarWrapper title="Characteristics">
                     <div
                         style={{
                             display: "flex",
@@ -300,10 +300,62 @@ export function SwellingPainOverView({
                                 color={"lightgray"}
                             />
                         </RangeGraph>
+
+                        {RenderLegend()}
                     </div>
                 </ChartToolbarWrapper>
             </Group>
         </>
+    );
+}
+
+function RenderLegend(): ReactNode {
+    return (
+        <div style={{ display: "flex", gap: "12px" }}>
+            <div style={{ display: "flex", gap: "5px" }}>
+                <div>
+                    <Triangle size={40} rotation={180} />
+                </div>
+                <span> Average </span>
+            </div>
+            <div style={{ display: "flex", gap: "4px" }}>
+                <div>
+                    <Triangle size={40} rotation={180} color="purple" />
+                </div>
+                <span> Normal range </span>
+            </div>
+            <div style={{ display: "flex", gap: "4px" }}>
+                <div style={{ width: "20px", height: "15px" }}>
+                    <svg style={{ width: "20px", height: "15px" }}>
+                        {/* Left vertical line */}
+                        <rect
+                            x={0}
+                            y={5}
+                            width={2}
+                            height={10}
+                            fill={"black"}
+                        />
+                        {/* Horizontal line */}
+                        <rect
+                            x={0}
+                            y={9}
+                            width={15}
+                            height={2}
+                            fill={"black"}
+                        />
+                        {/* Right vertical line */}
+                        <rect
+                            x={15}
+                            y={5}
+                            width={2}
+                            height={10}
+                            fill={"black"}
+                        />
+                    </svg>
+                </div>
+                <span> Standard deviation </span>
+            </div>
+        </div>
     );
 }
 

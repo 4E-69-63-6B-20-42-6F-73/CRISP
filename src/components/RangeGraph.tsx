@@ -126,7 +126,7 @@ const StandardDeviationIndicator: React.FC<
             {/* Horizontal line */}
             <rect
                 x={x_begin + "%"}
-                y={"47%"} // center of filled bar
+                y={"48%"} // center of filled bar
                 width={width + "%"}
                 height={height}
                 fill={color}

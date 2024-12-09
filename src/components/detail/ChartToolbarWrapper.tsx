@@ -131,6 +131,7 @@ export function ChartToolbarWrapper({
                     display: "flex",
                     justifyContent: "right",
                     height: "40px",
+                    padding: "0",
                 }}
             >
                 <Caption1Strong style={{ flexGrow: 1 }}>{title}</Caption1Strong>
