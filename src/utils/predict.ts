@@ -1,5 +1,6 @@
 import { expectedOrderForModel } from "@/orders";
 import { reorderObjectValuesByKeyList } from "./reorder";
+import { FileInput } from "@/types";
 
 export function predict({
     data,
@@ -7,7 +8,7 @@ export function predict({
     onComplete,
     onError,
 }: {
-    data: any[];
+    data: FileInput[];
     onProgress: (type: string, index: number, total: number) => void;
     onComplete: (predictions: any) => void;
     onError: (error: any) => void;
@@ -43,7 +44,7 @@ export function predict({
 }
 
 // Preprocess by duplicating keys with pijn or zwelling into _positieve and _negatieve and reorder as expected by the model. And capitalize first letters
-function pre_process(data: any) {
+function pre_process(data: FileInput) {
     const copy = { ...data };
 
     for (const key of Object.keys(data)) {
