@@ -19,6 +19,12 @@ type RangeIndicatorProps = {
     color?: string;
 };
 
+type StandardDeviationIndicatorProps = {
+    sd: number;
+    average: number;
+    color?: string;
+};
+
 const scale = (
     value: number,
     domain: [number, number],
@@ -106,6 +112,47 @@ const RangeIndicator: React.FC<
     );
 };
 
+// StandardDeviationIndicator Component
+const StandardDeviationIndicator: React.FC<
+    StandardDeviationIndicatorProps & { minValue?: number; maxValue?: number }
+> = ({ sd, average, minValue = 0, maxValue = 100, color = "black" }) => {
+    const height = 2;
+    const x_begin = scale(average - sd, [minValue, maxValue], [0, 100]);
+
+    // If we dont start at 0, scaling sd will be negative. So
+    const x_end = scale(average + sd, [minValue, maxValue], [0, 100]);
+    const width = x_end - x_begin;
+
+    return (
+        <>
+            {/* Left vertical line */}
+            <rect
+                x={x_begin + "%"}
+                y={"30%"} //
+                width={"0.5%"}
+                height={"20%"}
+                fill={color}
+            />
+            {/* Horizontal line */}
+            <rect
+                x={x_begin + "%"}
+                y={"37%"} // center of filled bar
+                width={width + "%"}
+                height={height}
+                fill={color}
+            />
+            {/* Right vertical line */}
+            <rect
+                x={x_begin + width + "%"}
+                y={"30%"} //
+                width={"0.5%"}
+                height={"20%"}
+                fill={color}
+            />
+        </>
+    );
+};
+
 // RangeGraph Component
 type RangeGraphProps = {
     minValue: number;
@@ -185,4 +232,10 @@ const RangeGraph: React.FC<RangeGraphProps> = ({
     );
 };
 
-export { RangeGraph, FilledBar, RangeIndicator, Indicator };
+export {
+    RangeGraph,
+    FilledBar,
+    RangeIndicator,
+    Indicator,
+    StandardDeviationIndicator,
+};
