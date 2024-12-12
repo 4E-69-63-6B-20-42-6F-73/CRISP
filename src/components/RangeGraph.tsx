@@ -1,10 +1,19 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3-shape";
 
+import CustomHoverCardOutsideSVG from "./CustomHoverCardOutsideSVG";
+
 // Types for individual components
 type FilledBarProps = {
     start: number;
     end: number;
+    color: string;
+};
+
+type FilledBarPercentageIndicatorProps = {
+    start: number;
+    percentage: number;
+    label: string;
     color: string;
 };
 
@@ -53,7 +62,8 @@ const FilledBar: React.FC<
     const height = "12";
 
     const startPercentage = scale(start, [minValue, maxValue], [0, 100]);
-    const filledWidth = scale(end, [minValue, maxValue], [0, 100]);
+    const filledWidth =
+        start === end ? 1 : scale(end, [minValue, maxValue], [0, 100]);
 
     return (
         <rect
@@ -66,16 +76,85 @@ const FilledBar: React.FC<
     );
 };
 
+const FilledBarRangeIndicator: React.FC<
+    FilledBarProps & { minValue?: number; maxValue?: number }
+> = ({ start, end, minValue = 0, maxValue = 100, color }) => {
+    return (
+        <CustomHoverCardOutsideSVG
+            data={{
+                color: color,
+                yValue: `${round(start)} - ${round(end)}`,
+                legend: "Range",
+            }}
+        >
+            <FilledBar
+                start={start}
+                end={end}
+                minValue={minValue}
+                maxValue={maxValue}
+                color={color}
+            />
+        </CustomHoverCardOutsideSVG>
+    );
+};
+
+const FilledBarPercentageIndicator: React.FC<
+    FilledBarPercentageIndicatorProps & { minValue?: number; maxValue?: number }
+> = ({ start, percentage, label, minValue = 0, maxValue = 100, color }) => {
+    return (
+        <CustomHoverCardOutsideSVG
+            data={{
+                color: color,
+                yValue: `${round(percentage)}%`,
+                legend: label,
+            }}
+        >
+            <FilledBar
+                start={start}
+                end={start + percentage}
+                minValue={minValue}
+                maxValue={maxValue}
+                color={color}
+            />
+        </CustomHoverCardOutsideSVG>
+    );
+};
+
 // Indicator Component
 const Indicator: React.FC<
     IndicatorProps & { minValue?: number; maxValue?: number }
 > = ({ x, minValue = 0, maxValue = 100, color = "blue" }) => {
     const x_position = scale(x, [minValue, maxValue], [0, 100]);
+
     return (
         <>
             <svg x={x_position + "%"} y="0%">
                 <Triangle rotation={180} size={50} color={color} />
             </svg>
+        </>
+    );
+};
+
+// AverageIndicator Component
+const AverageIndicator: React.FC<
+    IndicatorProps & { minValue?: number; maxValue?: number }
+> = ({ x, minValue = 0, maxValue = 100, color = "#5D3FD3" }) => {
+    return (
+        <>
+            <CustomHoverCardOutsideSVG
+                data={{
+                    color: color,
+                    yValue: round(x),
+                    legend: "Average",
+                }}
+            >
+                <Indicator
+                    x={x}
+                    minValue={minValue}
+                    maxValue={maxValue}
+                    color={color}
+                />
+            </CustomHoverCardOutsideSVG>
         </>
     );
 };
@@ -86,18 +165,34 @@ const RangeIndicator: React.FC<
 > = ({ start, end, minValue = 0, maxValue = 100, color = "purple" }) => {
     return (
         <>
-            <Indicator
-                x={start}
-                color={color}
-                minValue={minValue}
-                maxValue={maxValue}
-            />
-            <Indicator
-                x={end}
-                color={color}
-                minValue={minValue}
-                maxValue={maxValue}
-            />
+            <CustomHoverCardOutsideSVG
+                data={{
+                    color: color,
+                    yValue: start,
+                    legend: "Minimum",
+                }}
+            >
+                <Indicator
+                    x={start}
+                    color={color}
+                    minValue={minValue}
+                    maxValue={maxValue}
+                />
+            </CustomHoverCardOutsideSVG>
+            <CustomHoverCardOutsideSVG
+                data={{
+                    color: color,
+                    yValue: end,
+                    legend: "Maximum",
+                }}
+            >
+                <Indicator
+                    x={end}
+                    color={color}
+                    minValue={minValue}
+                    maxValue={maxValue}
+                />
+            </CustomHoverCardOutsideSVG>
         </>
     );
 };
@@ -115,30 +210,38 @@ const StandardDeviationIndicator: React.FC<
 
     return (
         <>
-            {/* Left vertical line */}
-            <rect
-                x={x_begin + "%"}
-                y={"40%"} //
-                width={height}
-                height={"20%"}
-                fill={color}
-            />
-            {/* Horizontal line */}
-            <rect
-                x={x_begin + "%"}
-                y={"48%"} // center of filled bar
-                width={width + "%"}
-                height={height}
-                fill={color}
-            />
-            {/* Right vertical line */}
-            <rect
-                x={x_begin + width + "%"}
-                y={"40%"} //
-                width={height}
-                height={"20%"}
-                fill={color}
-            />
+            <CustomHoverCardOutsideSVG
+                data={{
+                    color: color,
+                    yValue: round(sd),
+                    legend: "Standard deviation",
+                }}
+            >
+                {/* Left vertical line */}
+                <rect
+                    x={x_begin + "%"}
+                    y={"40%"} //
+                    width={height}
+                    height={"20%"}
+                    fill={color}
+                />
+                {/* Horizontal line */}
+                <rect
+                    x={x_begin + "%"}
+                    y={"48%"} // center of filled bar
+                    width={width + "%"}
+                    height={height}
+                    fill={color}
+                />
+                {/* Right vertical line */}
+                <rect
+                    x={x_begin + width + "%"}
+                    y={"40%"} //
+                    width={height}
+                    height={"20%"}
+                    fill={color}
+                />
+            </CustomHoverCardOutsideSVG>
         </>
     );
 };
@@ -240,10 +343,20 @@ const RangeGraph: React.FC<RangeGraphProps> = ({
     );
 };
 
+function round(value: number, decimals = 1): string {
+    return value.toLocaleString(undefined, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: decimals,
+    });
+}
+
 export {
     RangeGraph,
     FilledBar,
+    FilledBarRangeIndicator,
+    FilledBarPercentageIndicator,
     RangeIndicator,
+    AverageIndicator,
     Indicator,
     StandardDeviationIndicator,
     Triangle,

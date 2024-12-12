@@ -7,8 +7,9 @@ import { ChartToolbarWrapper } from "./ChartToolbarWrapper";
 import Group from "../Group";
 import { FileInput } from "@/types";
 import {
-    FilledBar,
-    Indicator,
+    AverageIndicator,
+    FilledBarPercentageIndicator,
+    FilledBarRangeIndicator,
     RangeGraph,
     RangeIndicator,
     StandardDeviationIndicator,
@@ -197,7 +198,7 @@ export function SwellingPainOverView({
                                     minValue={minValue}
                                     maxValue={maxValue}
                                 >
-                                    <FilledBar
+                                    <FilledBarRangeIndicator
                                         start={Math.min(
                                             ...filtered_data.map(
                                                 (x) => x[label] as number,
@@ -216,7 +217,7 @@ export function SwellingPainOverView({
                                             end={acceptedRange[1]}
                                         />
                                     )}
-                                    <Indicator x={averages[label]} />
+                                    <AverageIndicator x={averages[label]} />
                                     <StandardDeviationIndicator
                                         sd={standardDeviation(
                                             filtered_data.map(
@@ -231,18 +232,19 @@ export function SwellingPainOverView({
                         )}
 
                         <RangeGraph label="Sex" minValue={0} maxValue={100}>
-                            <FilledBar
+                            <FilledBarPercentageIndicator
                                 start={0}
-                                end={
+                                percentage={
                                     (filtered_data.filter(
                                         (x) => x.Sex[0] === "M",
                                     ).length /
                                         filtered_data.length) *
                                     100
                                 }
+                                label="Male"
                                 color={"lightblue"}
                             />
-                            <FilledBar
+                            <FilledBarPercentageIndicator
                                 start={
                                     (filtered_data.filter(
                                         (x) => x.Sex[0] === "M",
@@ -250,53 +252,74 @@ export function SwellingPainOverView({
                                         filtered_data.length) *
                                     100
                                 }
-                                end={100}
+                                percentage={
+                                    (filtered_data.filter(
+                                        (x) => x.Sex[0] !== "M",
+                                    ).length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="Female"
                                 color={"pink"}
                             />
                         </RangeGraph>
 
                         <RangeGraph label="RF" minValue={0} maxValue={100}>
-                            <FilledBar
+                            <FilledBarPercentageIndicator
                                 start={0}
-                                end={
+                                percentage={
                                     (filtered_data.filter((x) => x.RF === 1)
                                         .length /
                                         filtered_data.length) *
                                     100
                                 }
+                                label="RF positive"
                                 color={pallete[8]}
                             />
-                            <FilledBar
+                            <FilledBarPercentageIndicator
                                 start={
                                     (filtered_data.filter((x) => x.RF === 1)
                                         .length /
                                         filtered_data.length) *
                                     100
                                 }
-                                end={100}
+                                percentage={
+                                    (filtered_data.filter((x) => x.RF === 0)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="RF negative"
                                 color={"lightgray"}
                             />
                         </RangeGraph>
 
                         <RangeGraph label="aCCP" minValue={0} maxValue={100}>
-                            <FilledBar
+                            <FilledBarPercentageIndicator
                                 start={0}
-                                end={
+                                percentage={
                                     (filtered_data.filter((x) => x.aCCP === 1)
                                         .length /
                                         filtered_data.length) *
                                     100
                                 }
+                                label="aCCP positive"
                                 color={pallete[9]}
                             />
-                            <FilledBar
+                            <FilledBarPercentageIndicator
                                 start={
                                     (filtered_data.filter((x) => x.aCCP === 1)
                                         .length /
                                         filtered_data.length) *
                                     100
                                 }
-                                end={100}
+                                percentage={
+                                    (filtered_data.filter((x) => x.aCCP === 0)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="aCCP negative"
                                 color={"lightgray"}
                             />
                         </RangeGraph>
