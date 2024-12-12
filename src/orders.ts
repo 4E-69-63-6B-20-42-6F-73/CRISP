@@ -127,7 +127,7 @@ const expectedColumnInFile: string[] = [
     "Zwelling_pols L",
     "Pijn_heup rechts",
     "Pijn_heup links",
-];
+] as const;
 
 const lcat = [
     "Zwelling_Elleboog L_negative",

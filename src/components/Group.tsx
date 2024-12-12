@@ -15,6 +15,7 @@ const Group = ({ children, childHeight, childWidth }: GroupProps) => {
                 flexDirection: "row",
                 gap: "12px",
                 alignItems: "center",
+                overflow: "auto",
             }}
         >
             {React.Children.map(children, (child) => (
@@ -27,6 +28,7 @@ const Group = ({ children, childHeight, childWidth }: GroupProps) => {
                         minHeight: childHeight,
                         maxHeight: childHeight,
                         padding: "12px",
+                        overflow: "auto",
                     }}
                 >
                     {child}

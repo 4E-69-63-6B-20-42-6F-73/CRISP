@@ -94,9 +94,15 @@ export function ChartToolbarWrapper({
     };
 
     const downloadChart = () => {
+        const margin = 20; // in pixel
         if (wrapperRef.current) {
             toPng(wrapperRef.current, {
                 filter: (node) => node.tagName !== "BUTTON",
+                width: wrapperRef.current.scrollWidth + 2 * margin,
+                height: wrapperRef.current.scrollHeight + 2 * margin,
+                style: {
+                    padding: `${margin}px`,
+                },
             }).then((dataUrl) => {
                 const link = document.createElement("a");
                 link.href = dataUrl;
@@ -125,6 +131,7 @@ export function ChartToolbarWrapper({
                     display: "flex",
                     justifyContent: "right",
                     height: "40px",
+                    padding: "0",
                 }}
             >
                 <Caption1Strong style={{ flexGrow: 1 }}>{title}</Caption1Strong>

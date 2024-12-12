@@ -1,14 +1,75 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { MannequinDisplay } from "../Mannequin/MannequinDisplay";
-import { expectedColumnInFile } from "@/orders";
 import { Radio, RadioGroup, Text } from "@fluentui/react-components";
 import { getClusterColor } from "./clusterColerUtils";
 import { ChartToolbarWrapper } from "./ChartToolbarWrapper";
 
 import Group from "../Group";
+import { FileInput } from "@/types";
+import {
+    AverageIndicator,
+    FilledBarPercentageIndicator,
+    FilledBarRangeIndicator,
+    RangeGraph,
+    RangeIndicator,
+    StandardDeviationIndicator,
+    Triangle,
+} from "../RangeGraph";
+import { standardDeviation } from "@/utils/standardDeviation";
+
+const pallete = [
+    "#fd7f6f",
+    "#7eb0d5",
+    "#b2e061",
+    "#adebb3",
+    "#ffb55a",
+    "#808080",
+    "#beb9db",
+    "#fdcce5",
+    "#8bd3c7",
+    "#bd7ebe",
+];
+
+const parameterConfig = [
+    {
+        label: "Leuko",
+        minValue: 0,
+        maxValue: 20,
+        acceptedRange: [4, 10],
+    },
+    {
+        label: "Hb",
+        minValue: 0,
+        maxValue: 20,
+        acceptedRange: [8, 10],
+    },
+    {
+        label: "MCV",
+        minValue: 50,
+        maxValue: 250,
+        acceptedRange: [80, 100],
+    },
+    {
+        label: "Trom",
+        minValue: 0,
+        maxValue: 1100,
+        acceptedRange: [150, 400],
+    },
+    {
+        label: "BSE",
+        minValue: 0,
+        maxValue: 140,
+        acceptedRange: [0, 25],
+    },
+    {
+        label: "Age",
+        minValue: 0,
+        maxValue: 120,
+    },
+];
 
 interface SwellingPainOverViewProps {
-    data: any[];
+    data: FileInput[];
     clusters: number[];
 }
 
@@ -16,14 +77,15 @@ export function SwellingPainOverView({
     data,
     clusters,
 }: SwellingPainOverViewProps) {
-    const [swelling, pain] = seperateZwellingAndPijn(data);
-
     const [filtering, setFiltering] = useState<number | null>(null);
 
-    const averageSwelling = MeanOfRecord(
-        applyFiltering(swelling, clusters, filtering),
-    );
-    const averagePain = MeanOfRecord(applyFiltering(pain, clusters, filtering));
+    const filtered_data = applyFiltering(data, clusters, filtering);
+
+    const [swelling, pain] = seperateZwellingAndPijn(filtered_data);
+    const averageSwelling = MeanOfRecord(swelling);
+    const averagePain = MeanOfRecord(pain);
+
+    const averages = MeanOfRecord(filtered_data);
 
     return (
         <>
@@ -115,8 +177,208 @@ export function SwellingPainOverView({
                         fillColor={getClusterColor(filtering)}
                     ></MannequinDisplay>
                 </ChartToolbarWrapper>
+
+                <ChartToolbarWrapper title="Characteristics">
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "20px",
+                            flexDirection: "column",
+                            height: "inherit",
+                        }}
+                    >
+                        {parameterConfig.map(
+                            (
+                                { label, minValue, maxValue, acceptedRange },
+                                i,
+                            ) => (
+                                <RangeGraph
+                                    key={label}
+                                    label={label}
+                                    minValue={minValue}
+                                    maxValue={maxValue}
+                                >
+                                    <FilledBarRangeIndicator
+                                        start={Math.min(
+                                            ...filtered_data.map(
+                                                (x) => x[label] as number,
+                                            ),
+                                        )}
+                                        end={Math.max(
+                                            ...filtered_data.map(
+                                                (x) => x[label] as number,
+                                            ),
+                                        )}
+                                        color={pallete[i]}
+                                    />
+                                    {acceptedRange && (
+                                        <RangeIndicator
+                                            start={acceptedRange[0]}
+                                            end={acceptedRange[1]}
+                                        />
+                                    )}
+                                    <AverageIndicator x={averages[label]} />
+                                    <StandardDeviationIndicator
+                                        sd={standardDeviation(
+                                            filtered_data.map(
+                                                (x) => x[label] as number,
+                                            ),
+                                            filtering === null,
+                                        )}
+                                        average={averages[label]}
+                                    />
+                                </RangeGraph>
+                            ),
+                        )}
+
+                        <RangeGraph label="Sex" minValue={0} maxValue={100}>
+                            <FilledBarPercentageIndicator
+                                start={0}
+                                percentage={
+                                    (filtered_data.filter(
+                                        (x) => x.Sex[0] === "M",
+                                    ).length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="Male"
+                                color={"lightblue"}
+                            />
+                            <FilledBarPercentageIndicator
+                                start={
+                                    (filtered_data.filter(
+                                        (x) => x.Sex[0] === "M",
+                                    ).length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                percentage={
+                                    (filtered_data.filter(
+                                        (x) => x.Sex[0] !== "M",
+                                    ).length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="Female"
+                                color={"pink"}
+                            />
+                        </RangeGraph>
+
+                        <RangeGraph label="RF" minValue={0} maxValue={100}>
+                            <FilledBarPercentageIndicator
+                                start={0}
+                                percentage={
+                                    (filtered_data.filter((x) => x.RF === 1)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="RF positive"
+                                color={pallete[8]}
+                            />
+                            <FilledBarPercentageIndicator
+                                start={
+                                    (filtered_data.filter((x) => x.RF === 1)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                percentage={
+                                    (filtered_data.filter((x) => x.RF === 0)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="RF negative"
+                                color={"lightgray"}
+                            />
+                        </RangeGraph>
+
+                        <RangeGraph label="aCCP" minValue={0} maxValue={100}>
+                            <FilledBarPercentageIndicator
+                                start={0}
+                                percentage={
+                                    (filtered_data.filter((x) => x.aCCP === 1)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="aCCP positive"
+                                color={pallete[9]}
+                            />
+                            <FilledBarPercentageIndicator
+                                start={
+                                    (filtered_data.filter((x) => x.aCCP === 1)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                percentage={
+                                    (filtered_data.filter((x) => x.aCCP === 0)
+                                        .length /
+                                        filtered_data.length) *
+                                    100
+                                }
+                                label="aCCP negative"
+                                color={"lightgray"}
+                            />
+                        </RangeGraph>
+
+                        {RenderLegend()}
+                    </div>
+                </ChartToolbarWrapper>
             </Group>
         </>
+    );
+}
+
+function RenderLegend(): ReactNode {
+    return (
+        <div style={{ display: "flex", gap: "12px" }}>
+            <div style={{ display: "flex", gap: "5px" }}>
+                <div>
+                    <Triangle size={40} rotation={180} />
+                </div>
+                <span> Average </span>
+            </div>
+            <div style={{ display: "flex", gap: "4px" }}>
+                <div>
+                    <Triangle size={40} rotation={180} color="purple" />
+                </div>
+                <span> Normal range </span>
+            </div>
+            <div style={{ display: "flex", gap: "4px" }}>
+                <div style={{ width: "20px", height: "15px" }}>
+                    <svg style={{ width: "20px", height: "15px" }}>
+                        {/* Left vertical line */}
+                        <rect
+                            x={0}
+                            y={5}
+                            width={2}
+                            height={10}
+                            fill={"black"}
+                        />
+                        {/* Horizontal line */}
+                        <rect
+                            x={0}
+                            y={9}
+                            width={15}
+                            height={2}
+                            fill={"black"}
+                        />
+                        {/* Right vertical line */}
+                        <rect
+                            x={15}
+                            y={5}
+                            width={2}
+                            height={10}
+                            fill={"black"}
+                        />
+                    </svg>
+                </div>
+                <span> Standard deviation </span>
+            </div>
+        </div>
     );
 }
 
@@ -135,16 +397,9 @@ function seperateZwellingAndPijn(
         (x) =>
             Object.fromEntries(
                 Object.entries(x)
-                    .filter(([key, _]) =>
-                        expectedColumnInFile[Number(key)].startsWith(
-                            "Zwelling",
-                        ),
-                    )
+                    .filter(([key, _]) => key.startsWith("Zwelling"))
                     .map(([key, value]) => [
-                        expectedColumnInFile[Number(key)].replace(
-                            "Zwelling_",
-                            "",
-                        ),
+                        key.replace("Zwelling_", ""),
                         value as number,
                     ]),
             ) as Record<string, number>,
@@ -154,11 +409,9 @@ function seperateZwellingAndPijn(
         (x) =>
             Object.fromEntries(
                 Object.entries(x)
-                    .filter(([key, _]) =>
-                        expectedColumnInFile[Number(key)].startsWith("Pijn"),
-                    )
+                    .filter(([key, _]) => key.startsWith("Pijn"))
                     .map(([key, value]) => [
-                        expectedColumnInFile[Number(key)].replace("Pijn_", ""),
+                        key.replace("Pijn_", ""),
                         value as number,
                     ]),
             ) as Record<string, number>,
@@ -181,11 +434,11 @@ function MeanOfRecord(data: Record<string, number>[]) {
 
     return means;
 }
-function applyFiltering(
-    data: Record<string, number>[],
+function applyFiltering<T>(
+    data: T[],
     clusters: number[],
     filtering: number | null,
-): Record<string, number>[] {
+): T[] {
     return filtering != null
         ? data.filter((_, index) => clusters[index] == filtering)
         : data;

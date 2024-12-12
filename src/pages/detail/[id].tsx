@@ -57,8 +57,7 @@ export default function Details() {
     );
 
     const data = analyse.files
-        .flatMap((x) => x.content as any[])
-        .map((x) => Object.values(x) as any[])
+        .flatMap((x) => x.content)
         .filter((_, i) => (analyse.prediction ?? [])[i].prediction !== -1);
 
     const clustering = predictions.map((x) => x.prediction);
@@ -135,7 +134,7 @@ export default function Details() {
                     }
                 >
                     <DetailUmap
-                        data={data}
+                        data={data.map((x) => Object.values(x))}
                         clusters={clustering}
                         patientIds={patients}
                         settings={umapSettings}

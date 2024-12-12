@@ -18,6 +18,8 @@ import extractContent from "@/utils/extractContent";
 import SpinnerButton from "@/components/SpinnerButton";
 import { expectedColumnInFile } from "@/orders";
 
+import { FileInput } from "@/types";
+
 const useClasses = makeStyles({
     divCreateButton: {
         display: "flex",
@@ -40,7 +42,7 @@ const useClasses = makeStyles({
 type ValidFile = {
     file: File;
     fileName: string;
-    content: any[];
+    content: FileInput[];
     isValid: true;
 };
 
@@ -83,7 +85,7 @@ export default function Index() {
             return {
                 file,
                 fileName: file.name,
-                content,
+                content: content as FileInput[],
                 isValid: true,
             } as ValidFile;
         } else {
