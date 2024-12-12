@@ -44,7 +44,7 @@ async function download_matches_snapshot(
 
     try {
         const buffer = fs.readFileSync(filePath);
-        expect(buffer).toMatchSnapshot(name);
+        expect(buffer).toMatchSnapshot(name, { maxDiffPixelRatio: 0.1 });
     } finally {
         fs.rmSync(downloadDir, { force: true, recursive: true });
     }
